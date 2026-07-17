@@ -12,7 +12,8 @@ function NumberField({ label, value, onChange }: { label: string; value: number;
       <input
         type="number" min={0}
         value={value}
-        onChange={(e) => onChange(Math.max(0, Number(e.target.value) || 0))}
+        onChange={(e) => onChange(Number(e.target.value))}
+        onBlur={(e) => onChange(Math.max(0, Number(e.target.value) || 0))}
         className="w-24 rounded border border-zinc-700 bg-zinc-800 px-2 py-1 text-right font-mono"
       />
     </label>
@@ -157,7 +158,11 @@ export default function InventorySection() {
               type="file"
               accept="application/json"
               className="hidden"
-              onChange={(e) => e.target.files?.[0] && doImport(e.target.files[0])}
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                e.target.value = '';
+                if (file) doImport(file);
+              }}
             />
           </div>
         </section>
