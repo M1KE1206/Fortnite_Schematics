@@ -17,9 +17,17 @@ describe('levelUpCost', () => {
     // 25→30 = 5/10 van tier 20→30 (40 PD + 11 LiB) = 20 PD + 5.5→6 LiB
     expect(levelUpCost(25, 30, DEFAULT_COSTS)).toEqual({ pureDropsOfRain: 20, lightningInABottle: 6 });
   });
+  it('spans tier boundaries and ceils once per resource', () => {
+    // 15→25 = 5 levels of tier 10→20 (2 PD each) + 5 levels of tier 20→30 (4 PD + 1.1 LiB each)
+    // PD: 5*2 + 5*4 = 30; LiB: 5*1.1 = 5.5 → 6
+    expect(levelUpCost(15, 25, DEFAULT_COSTS)).toEqual({ pureDropsOfRain: 30, lightningInABottle: 6 });
+  });
   it('no cost when at or above target', () => {
     expect(levelUpCost(50, 50, DEFAULT_COSTS)).toEqual({});
     expect(levelUpCost(50, 40, DEFAULT_COSTS)).toEqual({});
+  });
+  it('clamps out-of-range levels to 10..50', () => {
+    expect(levelUpCost(1, 60, DEFAULT_COSTS)).toEqual(levelUpCost(10, 50, DEFAULT_COSTS));
   });
 });
 
@@ -67,6 +75,20 @@ describe('schematicCost', () => {
     const c = schematicCost(s, DEFAULT_COSTS);
     expect(c.rePerk).toBe(1500);
     expect(c.fireUp).toBe(1200);
+  });
+  it('element change water adds rePerk + frostUp', () => {
+    const s = makeDefaultSchematic();
+    s.elementChange = { needed: true, element: 'water' };
+    const c = schematicCost(s, DEFAULT_COSTS);
+    expect(c.rePerk).toBe(1500);
+    expect(c.frostUp).toBe(1200);
+  });
+  it('element change nature adds rePerk + ampUp', () => {
+    const s = makeDefaultSchematic();
+    s.elementChange = { needed: true, element: 'nature' };
+    const c = schematicCost(s, DEFAULT_COSTS);
+    expect(c.rePerk).toBe(1500);
+    expect(c.ampUp).toBe(1200);
   });
   it('element change energy splits over three elementals', () => {
     const s = makeDefaultSchematic();
