@@ -1,6 +1,6 @@
 import { Check, X } from 'lucide-react';
 import { RESOURCES } from '../data/costs';
-import { totalCost } from '../lib/calculator';
+import { shortage, totalCost } from '../lib/calculator';
 import { useAppState } from '../state/AppStateContext';
 
 const GROUP_LABELS: Record<string, string> = {
@@ -12,10 +12,15 @@ const GROUP_LABELS: Record<string, string> = {
 export default function TotalsSection() {
   const { state } = useAppState();
   const totals = totalCost(state.schematics, state.costs);
+  const missing = shortage(totals, state.inventory);
   const groups = ['evolution', 'perk', 'element'] as const;
 
   if (state.schematics.length === 0) {
     return <p className="py-12 text-center text-zinc-500">Add schematics to see totals.</p>;
+  }
+
+  if (Object.keys(totals).length === 0) {
+    return <p className="py-12 text-center text-zinc-500">Nothing needed - all schematics are fully configured.</p>;
   }
 
   return (
@@ -40,17 +45,17 @@ export default function TotalsSection() {
                 {rows.map((r) => {
                   const needed = totals[r.key] ?? 0;
                   const have = state.inventory[r.key] ?? 0;
-                  const missing = Math.max(0, needed - have);
+                  const rowMissing = missing[r.key] ?? 0;
                   return (
                     <tr key={r.key} className="border-b border-zinc-800/50">
                       <td className="py-1.5">{r.label}</td>
                       <td className="py-1.5 text-right font-mono tabular-nums">{needed.toLocaleString('en-US')}</td>
                       <td className="py-1.5 text-right font-mono tabular-nums text-zinc-400">{have.toLocaleString('en-US')}</td>
-                      <td className={`py-1.5 text-right font-mono tabular-nums ${missing > 0 ? 'text-red-400' : 'text-green-400'}`}>
-                        {missing.toLocaleString('en-US')}
+                      <td className={`py-1.5 text-right font-mono tabular-nums ${rowMissing > 0 ? 'text-red-400' : 'text-green-400'}`}>
+                        {rowMissing.toLocaleString('en-US')}
                       </td>
                       <td className="pl-2">
-                        {missing > 0 ? <X size={14} className="text-red-400" /> : <Check size={14} className="text-green-400" />}
+                        {rowMissing > 0 ? <X size={14} className="text-red-400" /> : <Check size={14} className="text-green-400" />}
                       </td>
                     </tr>
                   );

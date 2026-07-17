@@ -40,7 +40,6 @@ export interface Schematic {
   id: string;
   name: string;
   iconUrl: string | null; // data-URL of https-URL
-  fallbackIcon: string;   // lucide icon-naam, bv. 'crosshair'
   currentLevel: number;   // 10-50
   targetLevel: number;    // 10-50
   perkSlots: PerkSlot[];  // lengte 6; index 5 = element-slot

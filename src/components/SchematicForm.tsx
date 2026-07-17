@@ -34,6 +34,7 @@ export default function SchematicForm({ initial, onSave, onCancel }: Props) {
       requestId.current++;
       setResults([]);
       setWikiError(false);
+      setSearching(false);
       return;
     }
     debounce.current = window.setTimeout(async () => {
@@ -127,7 +128,10 @@ export default function SchematicForm({ initial, onSave, onCancel }: Props) {
           <input
             type="number" min={10} max={50}
             value={draft.currentLevel}
-            onChange={(e) => set('currentLevel', Number(e.target.value))}
+            onChange={(e) => {
+              const n = Number(e.target.value);
+              set('currentLevel', Number.isFinite(n) ? n : 10);
+            }}
             onBlur={() => set('currentLevel', Math.min(50, Math.max(10, draft.currentLevel || 10)))}
             className="w-20 rounded border border-zinc-700 bg-zinc-800 px-2 py-1"
           />
@@ -135,7 +139,10 @@ export default function SchematicForm({ initial, onSave, onCancel }: Props) {
           <input
             type="number" min={10} max={50}
             value={draft.targetLevel}
-            onChange={(e) => set('targetLevel', Number(e.target.value))}
+            onChange={(e) => {
+              const n = Number(e.target.value);
+              set('targetLevel', Number.isFinite(n) ? n : 10);
+            }}
             onBlur={() => set('targetLevel', Math.min(50, Math.max(10, draft.targetLevel || 10)))}
             className="w-20 rounded border border-zinc-700 bg-zinc-800 px-2 py-1"
           />

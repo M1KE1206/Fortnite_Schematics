@@ -12,7 +12,10 @@ function NumberField({ label, value, onChange }: { label: string; value: number;
       <input
         type="number" min={0}
         value={value}
-        onChange={(e) => onChange(Number(e.target.value))}
+        onChange={(e) => {
+          const n = Number(e.target.value);
+          onChange(Number.isFinite(n) ? n : 0);
+        }}
         onBlur={(e) => onChange(Math.max(0, Number(e.target.value) || 0))}
         className="w-24 rounded border border-zinc-700 bg-zinc-800 px-2 py-1 text-right font-mono"
       />

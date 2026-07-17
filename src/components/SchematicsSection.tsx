@@ -27,7 +27,9 @@ export default function SchematicsSection() {
   return (
     <div>
       <div className="mb-4 flex items-center justify-between">
-        <p className="text-sm text-zinc-400">{state.schematics.length} schematic(s)</p>
+        <p className="text-sm text-zinc-400">
+          {state.schematics.length} {state.schematics.length === 1 ? 'schematic' : 'schematics'}
+        </p>
         <button
           onClick={() => setEditing(makeDefaultSchematic())}
           className="flex items-center gap-2 rounded bg-amber-500 px-3 py-2 text-sm font-semibold text-zinc-950 hover:bg-amber-400"

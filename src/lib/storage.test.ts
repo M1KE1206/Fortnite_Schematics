@@ -59,6 +59,43 @@ describe('storage', () => {
     expect(() => importJson(payload)).toThrow();
   });
 
+  it('loadState salvages valid schematics and drops invalid ones', () => {
+    const valid = makeDefaultSchematic();
+    valid.name = 'Nocturno';
+    const payload = {
+      version: 1,
+      state: {
+        schematics: [valid, { id: 'broken' }],
+        inventory: { perkUp: 10 },
+        costs: DEFAULT_COSTS,
+        icons: {},
+      },
+    };
+    localStorage.setItem('stw-tracker:v1:state', JSON.stringify(payload));
+    const s = loadState();
+    expect(s.schematics).toEqual([valid]);
+    expect(s.inventory).toEqual({ perkUp: 10 });
+    expect(s.costs).toEqual(DEFAULT_COSTS);
+  });
+
+  it('loadState keeps valid schematics and restores default costs when costs are broken', () => {
+    const valid = makeDefaultSchematic();
+    valid.name = 'Siegebreaker';
+    const payload = {
+      version: 1,
+      state: {
+        schematics: [valid],
+        inventory: {},
+        costs: { levelTiers: [] }, // missing required fields
+        icons: {},
+      },
+    };
+    localStorage.setItem('stw-tracker:v1:state', JSON.stringify(payload));
+    const s = loadState();
+    expect(s.schematics).toEqual([valid]);
+    expect(s.costs).toEqual(DEFAULT_COSTS);
+  });
+
   it('saveState returns false when setItem throws', () => {
     const storage = memoryStorage();
     storage.setItem = () => {

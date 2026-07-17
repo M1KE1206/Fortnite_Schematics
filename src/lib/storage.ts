@@ -50,8 +50,17 @@ export function loadState(): AppState {
     const raw = localStorage.getItem(KEY);
     if (!raw) return defaults();
     const parsed = JSON.parse(raw) as { version?: number; state?: unknown };
-    if (parsed.version !== VERSION || !isAppState(parsed.state)) return defaults();
-    return parsed.state;
+    if (parsed.version !== VERSION || !isPlainObject(parsed.state)) return defaults();
+    if (isAppState(parsed.state)) return parsed.state;
+
+    // Envelope is valid but the state failed full validation - salvage what we can
+    // instead of discarding everything.
+    const state = parsed.state;
+    const schematics = Array.isArray(state.schematics) ? state.schematics.filter(isSchematic) : [];
+    const inventory = isPlainObject(state.inventory) ? (state.inventory as Inventory) : {};
+    const costs = isCostConfig(state.costs) ? (state.costs as CostConfig) : structuredClone(DEFAULT_COSTS);
+    const icons = isPlainObject(state.icons) ? (state.icons as Record<string, string>) : {};
+    return { schematics, inventory, costs, icons };
   } catch {
     return defaults();
   }

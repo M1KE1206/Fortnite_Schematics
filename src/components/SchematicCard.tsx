@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { ChevronDown, ChevronUp, ImageOff, Pencil, Trash2, Zap } from 'lucide-react';
 import type { Schematic } from '../types';
 import { schematicCost } from '../lib/calculator';
@@ -15,7 +15,7 @@ interface Props {
 export default function SchematicCard({ schematic, onEdit, onDelete }: Props) {
   const { state } = useAppState();
   const [open, setOpen] = useState(false);
-  const cost = schematicCost(schematic, state.costs);
+  const cost = useMemo(() => schematicCost(schematic, state.costs), [schematic, state.costs]);
 
   return (
     <div className="rounded-lg border border-zinc-800 bg-zinc-950 p-4">

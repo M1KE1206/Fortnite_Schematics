@@ -80,7 +80,6 @@ export function makeDefaultSchematic(): Schematic {
     id: crypto.randomUUID(),
     name: '',
     iconUrl: null,
-    fallbackIcon: 'crosshair',
     currentLevel: 10,
     targetLevel: 50,
     perkSlots: Array.from({ length: 6 }, () => ({

@@ -42,11 +42,36 @@ describe('searchWikiIcons', () => {
     vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new TypeError('fail')));
     await expect(searchWikiIcons('x')).rejects.toThrow('Wiki unreachable');
   });
+
+  it('resolves parsed results on a successful response', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({
+          query: { pages: { '1': { index: 1, title: 'Nocturno', thumbnail: { source: 'https://img/n.png' } } } },
+        }),
+      }),
+    );
+    await expect(searchWikiIcons('Nocturno')).resolves.toEqual([
+      { title: 'Nocturno', thumbnailUrl: 'https://img/n.png' },
+    ]);
+  });
+
+  it('throws readable error when response is not ok', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false }));
+    await expect(searchWikiIcons('x')).rejects.toThrow('Wiki unreachable');
+  });
 });
 
 describe('toDataUrl', () => {
   it('falls back to original url on fetch failure', async () => {
     vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new TypeError('cors')));
+    await expect(toDataUrl('https://img/n.png')).resolves.toBe('https://img/n.png');
+  });
+
+  it('falls back to original url when response is not ok', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false }));
     await expect(toDataUrl('https://img/n.png')).resolves.toBe('https://img/n.png');
   });
 });
