@@ -15,11 +15,34 @@ function defaults(): AppState {
   return { schematics: [], inventory: {}, costs: structuredClone(DEFAULT_COSTS), icons: {} };
 }
 
+function isPlainObject(v: unknown): v is Record<string, unknown> {
+  return typeof v === 'object' && v !== null && !Array.isArray(v);
+}
+
+function isCostConfig(v: unknown): boolean {
+  if (!isPlainObject(v)) return false;
+  return Array.isArray(v.levelTiers)
+    && Array.isArray(v.perkSteps)
+    && typeof v.rePerkChange === 'number'
+    && typeof v.elementChangeRePerk === 'number'
+    && typeof v.elementChangeElemental === 'number';
+}
+
+function isSchematic(v: unknown): boolean {
+  if (!isPlainObject(v)) return false;
+  return typeof v.id === 'string'
+    && Array.isArray(v.perkSlots)
+    && typeof v.currentLevel === 'number'
+    && typeof v.targetLevel === 'number';
+}
+
 function isAppState(v: unknown): v is AppState {
-  if (typeof v !== 'object' || v === null) return false;
-  const o = v as Record<string, unknown>;
-  return Array.isArray(o.schematics) && typeof o.inventory === 'object' && o.inventory !== null
-    && typeof o.costs === 'object' && o.costs !== null && typeof o.icons === 'object' && o.icons !== null;
+  if (!isPlainObject(v)) return false;
+  return Array.isArray(v.schematics)
+    && v.schematics.every(isSchematic)
+    && isPlainObject(v.inventory)
+    && isCostConfig(v.costs)
+    && isPlainObject(v.icons);
 }
 
 export function loadState(): AppState {

@@ -53,4 +53,19 @@ describe('storage', () => {
     expect(() => importJson('{"hello":1}')).toThrow();
     expect(() => importJson('not json')).toThrow();
   });
+
+  it('importJson rejects state with empty costs object', () => {
+    const payload = '{"version":1,"state":{"schematics":[],"inventory":{},"costs":{},"icons":{}}}';
+    expect(() => importJson(payload)).toThrow();
+  });
+
+  it('saveState returns false when setItem throws', () => {
+    const storage = memoryStorage();
+    storage.setItem = () => {
+      throw new Error('QuotaExceededError');
+    };
+    vi.stubGlobal('localStorage', storage);
+    const state = loadState();
+    expect(saveState(state)).toBe(false);
+  });
 });
