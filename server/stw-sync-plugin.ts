@@ -29,6 +29,7 @@ function readBody(req: Connect.IncomingMessage): Promise<Record<string, unknown>
         resolve({});
       }
     });
+    req.on('error', () => resolve({}));
   });
 }
 
@@ -80,7 +81,8 @@ export function stwSyncPlugin(): Plugin {
       }
     } catch (e) {
       if (e instanceof EpicApiError) {
-        sendJson(res, e.status >= 400 && e.status < 600 ? e.status : 502, { error: e.message });
+        const status = e.status === 400 || e.status === 401 || e.status === 404 ? e.status : 502;
+        sendJson(res, status, { error: e.message });
       } else {
         console.error('[stw-sync] Internal error:', e);
         sendJson(res, 500, { error: 'Internal sync error' });
