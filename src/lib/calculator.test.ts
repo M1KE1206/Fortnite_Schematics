@@ -22,6 +22,15 @@ describe('levelUpCost', () => {
     // PD: 5*2 + 5*4 = 30; LiB: 5*1.1 = 5.5 → 6
     expect(levelUpCost(15, 25, DEFAULT_COSTS)).toEqual({ pureDropsOfRain: 30, lightningInABottle: 6 });
   });
+  it('ceils once per resource across multiple partial tiers', () => {
+    // 25→45: LiB = 5*1.1 + 10*2.2 + 5*3.3 = 44.0 (ceil-per-tier would give 45)
+    expect(levelUpCost(25, 45, DEFAULT_COSTS)).toEqual({
+      pureDropsOfRain: 120,
+      lightningInABottle: 44,
+      eyeOfTheStorm: 22,
+      stormShard: 6,
+    });
+  });
   it('no cost when at or above target', () => {
     expect(levelUpCost(50, 50, DEFAULT_COSTS)).toEqual({});
     expect(levelUpCost(50, 40, DEFAULT_COSTS)).toEqual({});
