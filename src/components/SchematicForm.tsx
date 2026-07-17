@@ -25,24 +25,31 @@ export default function SchematicForm({ initial, onSave, onCancel }: Props) {
   const [searching, setSearching] = useState(false);
   const [wikiError, setWikiError] = useState(false);
   const debounce = useRef<number>(undefined);
+  const requestId = useRef(0);
 
   useEffect(() => {
     window.clearTimeout(debounce.current);
     const q = draft.name.trim();
     if (q.length < 3) {
+      requestId.current++;
       setResults([]);
+      setWikiError(false);
       return;
     }
     debounce.current = window.setTimeout(async () => {
+      const id = ++requestId.current;
       setSearching(true);
       setWikiError(false);
       try {
-        setResults(await searchWikiIcons(`${q} schematic`));
+        const res = await searchWikiIcons(`${q} schematic`);
+        if (requestId.current === id) setResults(res);
       } catch {
-        setWikiError(true);
-        setResults([]);
+        if (requestId.current === id) {
+          setWikiError(true);
+          setResults([]);
+        }
       } finally {
-        setSearching(false);
+        if (requestId.current === id) setSearching(false);
       }
     }, 500);
     return () => window.clearTimeout(debounce.current);
@@ -120,14 +127,16 @@ export default function SchematicForm({ initial, onSave, onCancel }: Props) {
           <input
             type="number" min={10} max={50}
             value={draft.currentLevel}
-            onChange={(e) => set('currentLevel', Math.min(50, Math.max(10, Number(e.target.value))))}
+            onChange={(e) => set('currentLevel', Number(e.target.value))}
+            onBlur={() => set('currentLevel', Math.min(50, Math.max(10, draft.currentLevel || 10)))}
             className="w-20 rounded border border-zinc-700 bg-zinc-800 px-2 py-1"
           />
           <span className="text-zinc-500">to</span>
           <input
             type="number" min={10} max={50}
             value={draft.targetLevel}
-            onChange={(e) => set('targetLevel', Math.min(50, Math.max(10, Number(e.target.value))))}
+            onChange={(e) => set('targetLevel', Number(e.target.value))}
+            onBlur={() => set('targetLevel', Math.min(50, Math.max(10, draft.targetLevel || 10)))}
             className="w-20 rounded border border-zinc-700 bg-zinc-800 px-2 py-1"
           />
         </div>
@@ -148,7 +157,7 @@ export default function SchematicForm({ initial, onSave, onCancel }: Props) {
             <input
               type="checkbox"
               checked={draft.elementChange.needed}
-              onChange={(e) => set('elementChange', { ...draft.elementChange, needed: e.target.checked })}
+              onChange={(e) => set('elementChange', { needed: e.target.checked, element: e.target.checked ? draft.elementChange.element : null })}
             />
             Change element
           </label>
