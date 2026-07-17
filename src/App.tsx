@@ -3,6 +3,7 @@ import { AlertTriangle, Package, Sigma, Swords } from 'lucide-react';
 import { useAppState } from './state/AppStateContext';
 import SchematicsSection from './components/SchematicsSection';
 import TotalsSection from './components/TotalsSection';
+import InventorySection from './components/InventorySection';
 
 type Tab = 'schematics' | 'totals' | 'inventory';
 
@@ -43,7 +44,7 @@ export default function App() {
       <main className="mx-6 mb-6 rounded-b rounded-tr bg-zinc-900 p-6">
         {tab === 'schematics' && <SchematicsSection />}
         {tab === 'totals' && <TotalsSection />}
-        {tab === 'inventory' && <p className="text-zinc-400">Inventory section (Task 10)</p>}
+        {tab === 'inventory' && <InventorySection />}
       </main>
     </div>
   );
