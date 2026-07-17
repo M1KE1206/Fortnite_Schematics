@@ -1,32 +1,21 @@
-# React + TypeScript + Vite
+# STW Schematic Tracker
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Client-side tracker for Fortnite Save the World schematics: calculates the exact
+resources needed to bring schematics to max level (PL130) and god-roll all perks,
+across your whole collection, with inventory tracking and shortage overview.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Per-schematic level (10-50) and per-perk-slot rarity tracking (6 slots)
+- Reroll (RE-PERK!) and element change costs included
+- Automatic in-game icons via the Fortnite Wiki (no API key), cached in your browser
+- Aggregated totals + inventory shortage view
+- All cost values editable in Settings (defaults follow current in-game values)
+- Data stored in localStorage; JSON export/import for backup
 
-## React Compiler
+## Development
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
-```
-
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+npm install
+npm run dev     # dev server
+npm test        # unit tests (Vitest)
+npm run build   # production build to dist/
