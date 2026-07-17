@@ -8,14 +8,15 @@ export const DEFAULT_COSTS: CostConfig = {
     { pureDropsOfRain: 80, lightningInABottle: 33, eyeOfTheStorm: 22, stormShard: 11 },
   ],
   perkSteps: [
-    { perkUp: 45, specificAmount: 100, specificKey: 'uncommonPerkUp' },
-    { perkUp: 65, specificAmount: 150, specificKey: 'rarePerkUp' },
-    { perkUp: 95, specificAmount: 225, specificKey: 'epicPerkUp' },
-    { perkUp: 140, specificAmount: 345, specificKey: 'legendaryPerkUp' },
+    { rePerk: 45, specificAmount: 100, specificKey: 'uncommonPerkUp' },
+    { rePerk: 65, specificAmount: 150, specificKey: 'rarePerkUp' },
+    { rePerk: 95, specificAmount: 225, specificKey: 'epicPerkUp' },
+    { rePerk: 140, specificAmount: 345, specificKey: 'legendaryPerkUp' },
   ],
-  rePerkChange: 55,
-  elementChangeRePerk: 1500,
-  elementChangeElemental: 1200,
+  rePerkChange: 600,
+  elementChangeElemental: 1800,
+  elementChangeEnergyEach: 600,
+  elementChangePhysicalRePerk: 1500,
 };
 
 export const RESOURCES: { key: ResourceKey; label: string; group: 'evolution' | 'perk' | 'element' }[] = [
@@ -23,7 +24,6 @@ export const RESOURCES: { key: ResourceKey; label: string; group: 'evolution' | 
   { key: 'lightningInABottle', label: 'Lightning in a Bottle', group: 'evolution' },
   { key: 'eyeOfTheStorm', label: 'Eye of the Storm', group: 'evolution' },
   { key: 'stormShard', label: 'Storm Shard', group: 'evolution' },
-  { key: 'perkUp', label: 'PERK-UP!', group: 'perk' },
   { key: 'uncommonPerkUp', label: 'Uncommon PERK-UP!', group: 'perk' },
   { key: 'rarePerkUp', label: 'Rare PERK-UP!', group: 'perk' },
   { key: 'epicPerkUp', label: 'Epic PERK-UP!', group: 'perk' },
@@ -34,7 +34,7 @@ export const RESOURCES: { key: ResourceKey; label: string; group: 'evolution' | 
   { key: 'ampUp', label: 'AMP-UP!', group: 'element' },
 ];
 
-export const ELEMENT_RESOURCE: Record<Exclude<ElementType, 'energy'>, ResourceKey> = {
+export const ELEMENT_RESOURCE: Record<Exclude<ElementType, 'energy' | 'physical'>, ResourceKey> = {
   fire: 'fireUp',
   water: 'frostUp',
   nature: 'ampUp',

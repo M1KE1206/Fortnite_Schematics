@@ -29,7 +29,7 @@ describe('storage', () => {
     schematic.name = 'Nocturno';
     const state: AppState = {
       schematics: [schematic],
-      inventory: { perkUp: 500 },
+      inventory: { rePerk: 500 },
       costs: DEFAULT_COSTS,
       icons: { nocturno: 'data:image/png;base64,x' },
     };
@@ -66,7 +66,7 @@ describe('storage', () => {
       version: 1,
       state: {
         schematics: [valid, { id: 'broken' }],
-        inventory: { perkUp: 10 },
+        inventory: { rePerk: 10 },
         costs: DEFAULT_COSTS,
         icons: {},
       },
@@ -74,7 +74,7 @@ describe('storage', () => {
     localStorage.setItem('stw-tracker:v1:state', JSON.stringify(payload));
     const s = loadState();
     expect(s.schematics).toEqual([valid]);
-    expect(s.inventory).toEqual({ perkUp: 10 });
+    expect(s.inventory).toEqual({ rePerk: 10 });
     expect(s.costs).toEqual(DEFAULT_COSTS);
   });
 

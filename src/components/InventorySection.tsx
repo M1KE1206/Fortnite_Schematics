@@ -103,13 +103,13 @@ export default function InventorySection() {
                 <summary className="cursor-pointer text-zinc-300">Perk {stepNames[i]}</summary>
                 <div className="mt-2 space-y-2">
                   <NumberField
-                    label="PERK-UP!"
-                    value={step.perkUp}
+                    label="RE-PERK!"
+                    value={step.rePerk}
                     onChange={(n) =>
                       update({
                         costs: {
                           ...state.costs,
-                          perkSteps: state.costs.perkSteps.map((s, j) => (j === i ? { ...s, perkUp: n } : s)),
+                          perkSteps: state.costs.perkSteps.map((s, j) => (j === i ? { ...s, rePerk: n } : s)),
                         },
                       })
                     }
@@ -135,14 +135,19 @@ export default function InventorySection() {
               onChange={(n) => update({ costs: { ...state.costs, rePerkChange: n } })}
             />
             <NumberField
-              label="RE-PERK! per element change"
-              value={state.costs.elementChangeRePerk}
-              onChange={(n) => update({ costs: { ...state.costs, elementChangeRePerk: n } })}
-            />
-            <NumberField
               label="Elemental PERK-UP per element change"
               value={state.costs.elementChangeElemental}
               onChange={(n) => update({ costs: { ...state.costs, elementChangeElemental: n } })}
+            />
+            <NumberField
+              label="Each elemental for Energy change"
+              value={state.costs.elementChangeEnergyEach}
+              onChange={(n) => update({ costs: { ...state.costs, elementChangeEnergyEach: n } })}
+            />
+            <NumberField
+              label="RE-PERK! for Physical change"
+              value={state.costs.elementChangePhysicalRePerk}
+              onChange={(n) => update({ costs: { ...state.costs, elementChangePhysicalRePerk: n } })}
             />
           </div>
         </section>

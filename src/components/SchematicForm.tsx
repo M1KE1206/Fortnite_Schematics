@@ -16,6 +16,7 @@ const ELEMENTS: { value: ElementType; label: string }[] = [
   { value: 'water', label: 'Water' },
   { value: 'nature', label: 'Nature' },
   { value: 'energy', label: 'Energy' },
+  { value: 'physical', label: 'Physical' },
 ];
 
 export default function SchematicForm({ initial, onSave, onCancel }: Props) {

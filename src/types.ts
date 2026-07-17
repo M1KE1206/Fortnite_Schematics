@@ -9,14 +9,13 @@ export const RARITY_LABELS: Record<Rarity, string> = {
   gold: 'Gold',
 };
 
-export type ElementType = 'fire' | 'water' | 'nature' | 'energy';
+export type ElementType = 'fire' | 'water' | 'nature' | 'energy' | 'physical';
 
 export type ResourceKey =
   | 'pureDropsOfRain'
   | 'lightningInABottle'
   | 'eyeOfTheStorm'
   | 'stormShard'
-  | 'perkUp'
   | 'uncommonPerkUp'
   | 'rarePerkUp'
   | 'epicPerkUp'
@@ -54,7 +53,7 @@ export interface LevelTierCost {
 }
 
 export interface PerkStepCost {
-  perkUp: number;
+  rePerk: number;
   specificAmount: number;
   specificKey: ResourceKey;
 }
@@ -63,6 +62,7 @@ export interface CostConfig {
   levelTiers: LevelTierCost[]; // index 0 = 10→20 ... index 3 = 40→50
   perkSteps: PerkStepCost[];   // index 0 = white→green ... index 3 = purple→gold
   rePerkChange: number;
-  elementChangeRePerk: number;
-  elementChangeElemental: number;
+  elementChangeElemental: number;      // 1800, for fire/water/nature
+  elementChangeEnergyEach: number;     // 600, each of the three elementals
+  elementChangePhysicalRePerk: number; // 1500 RE-PERK!
 }

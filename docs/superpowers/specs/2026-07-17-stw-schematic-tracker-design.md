@@ -68,7 +68,9 @@ Tussenliggende levels tellen naar rato: elk level binnen een tier kost 1/10 van 
 
 ### Perk-upgrade, per perk per stap
 
-| Stap           | PERK-UP! | Rarity-specifiek        |
+RE-PERK! is de generieke resource voor zowel perk-upgrades als perk-wissels. PERK-UP! bestaat alleen in rarity-specifieke varianten (Uncommon/Rare/Epic/Legendary) en elementale varianten (FIRE-UP!/FROST-UP!/AMP-UP!) — er bestaat geen generieke "PERK-UP!" resource.
+
+| Stap           | RE-PERK! | Rarity-specifiek        |
 |----------------|----------|-------------------------|
 | White → Green  | 45       | 100 Uncommon PERK-UP!   |
 | Green → Blue   | 65       | 150 Rare PERK-UP!       |
@@ -77,8 +79,18 @@ Tussenliggende levels tellen naar rato: elk level binnen een tier kost 1/10 van 
 
 ### Perk wisselen (RE-PERK!)
 
-- Perk vervangen door een andere perk: **55 RE-PERK!** per wissel (default; aanpasbaar — waarde ter verificatie in-game).
-- Element wisselen (slot 6): **1500 RE-PERK! + 1200 elementaal PERK-UP** (FIRE-UP!/FROST-UP!/AMP-UP!; default, aanpasbaar). Energy vereist alle drie de elementals (elk 1/3 van het bedrag, naar boven afgerond).
+- Perk vervangen door een andere perk: **600 RE-PERK!** per wissel (default; aanpasbaar).
+- Element wisselen (slot 6), per gewenst element:
+
+  | Element  | Kosten                                          |
+  |----------|--------------------------------------------------|
+  | Fire     | 1800 FIRE-UP!                                     |
+  | Water    | 1800 FROST-UP!                                    |
+  | Nature   | 1800 AMP-UP!                                       |
+  | Energy   | 600 FIRE-UP! + 600 FROST-UP! + 600 AMP-UP!         |
+  | Physical | 1500 RE-PERK!                                      |
+
+  Fire/Water/Nature/Energy hebben geen RE-PERK!-component; Physical heeft geen elementale component.
 
 ## Berekeningen
 

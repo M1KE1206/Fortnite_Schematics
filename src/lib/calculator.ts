@@ -35,7 +35,7 @@ export function perkUpgradeCost(from: Rarity, to: Rarity, costs: CostConfig): Re
   const parts: ResourceTotals[] = [];
   for (let i = fromIdx; i < toIdx; i++) {
     const step = costs.perkSteps[i];
-    parts.push({ perkUp: step.perkUp, [step.specificKey]: step.specificAmount });
+    parts.push({ rePerk: step.rePerk, [step.specificKey]: step.specificAmount });
   }
   return addTotals(...parts);
 }
@@ -49,15 +49,17 @@ export function schematicCost(s: Schematic, costs: CostConfig): ResourceTotals {
   }
   if (s.elementChange.needed && s.elementChange.element) {
     const el = s.elementChange.element;
-    const elemental: ResourceTotals =
-      el === 'energy'
-        ? {
-            fireUp: Math.ceil(costs.elementChangeElemental / 3),
-            frostUp: Math.ceil(costs.elementChangeElemental / 3),
-            ampUp: Math.ceil(costs.elementChangeElemental / 3),
-          }
-        : { [ELEMENT_RESOURCE[el]]: costs.elementChangeElemental };
-    parts.push({ rePerk: costs.elementChangeRePerk }, elemental);
+    if (el === 'energy') {
+      parts.push({
+        fireUp: costs.elementChangeEnergyEach,
+        frostUp: costs.elementChangeEnergyEach,
+        ampUp: costs.elementChangeEnergyEach,
+      });
+    } else if (el === 'physical') {
+      parts.push({ rePerk: costs.elementChangePhysicalRePerk });
+    } else {
+      parts.push({ [ELEMENT_RESOURCE[el]]: costs.elementChangeElemental });
+    }
   }
   return addTotals(...parts);
 }

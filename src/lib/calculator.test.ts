@@ -43,12 +43,12 @@ describe('levelUpCost', () => {
 describe('perkUpgradeCost', () => {
   it('white→gold sums all steps', () => {
     expect(perkUpgradeCost('white', 'gold', DEFAULT_COSTS)).toEqual({
-      perkUp: 345, uncommonPerkUp: 100, rarePerkUp: 150, epicPerkUp: 225, legendaryPerkUp: 345,
+      rePerk: 345, uncommonPerkUp: 100, rarePerkUp: 150, epicPerkUp: 225, legendaryPerkUp: 345,
     });
   });
   it('blue→gold sums last two steps', () => {
     expect(perkUpgradeCost('blue', 'gold', DEFAULT_COSTS)).toEqual({
-      perkUp: 235, epicPerkUp: 225, legendaryPerkUp: 345,
+      rePerk: 235, epicPerkUp: 225, legendaryPerkUp: 345,
     });
   });
   it('no cost when already at or above target', () => {
@@ -62,50 +62,63 @@ describe('schematicCost', () => {
     const s = makeDefaultSchematic();
     const c = schematicCost(s, DEFAULT_COSTS);
     expect(c.pureDropsOfRain).toBe(200);
-    expect(c.perkUp).toBe(345 * 6);
+    expect(c.rePerk).toBe(345 * 6);
     expect(c.legendaryPerkUp).toBe(345 * 6);
-    expect(c.rePerk).toBeUndefined();
+    expect(Object.keys(c)).toEqual(
+      expect.not.arrayContaining(['perkUp']),
+    );
   });
   it('disabled slots do not count', () => {
     const s = makeDefaultSchematic();
     s.perkSlots.forEach((p) => (p.enabled = false));
     const c = schematicCost(s, DEFAULT_COSTS);
-    expect(c.perkUp).toBeUndefined();
+    expect(c.rePerk).toBeUndefined();
+    expect(c.legendaryPerkUp).toBeUndefined();
   });
-  it('reroll adds rePerk per flagged slot', () => {
+  it('reroll adds 600 rePerk per flagged slot on top of upgrade rePerk', () => {
     const s = makeDefaultSchematic();
     s.perkSlots[0].needsReroll = true;
     s.perkSlots[1].needsReroll = true;
-    expect(schematicCost(s, DEFAULT_COSTS).rePerk).toBe(110);
+    expect(schematicCost(s, DEFAULT_COSTS).rePerk).toBe(345 * 6 + 600 * 2);
   });
-  it('element change fire adds rePerk + fireUp', () => {
+  it('element change fire adds fireUp only (no extra rePerk)', () => {
     const s = makeDefaultSchematic();
     s.elementChange = { needed: true, element: 'fire' };
     const c = schematicCost(s, DEFAULT_COSTS);
-    expect(c.rePerk).toBe(1500);
-    expect(c.fireUp).toBe(1200);
+    expect(c.fireUp).toBe(1800);
+    expect(c.rePerk).toBe(345 * 6);
   });
-  it('element change water adds rePerk + frostUp', () => {
+  it('element change water adds frostUp only (no extra rePerk)', () => {
     const s = makeDefaultSchematic();
     s.elementChange = { needed: true, element: 'water' };
     const c = schematicCost(s, DEFAULT_COSTS);
-    expect(c.rePerk).toBe(1500);
-    expect(c.frostUp).toBe(1200);
+    expect(c.frostUp).toBe(1800);
+    expect(c.rePerk).toBe(345 * 6);
   });
-  it('element change nature adds rePerk + ampUp', () => {
+  it('element change nature adds ampUp only (no extra rePerk)', () => {
     const s = makeDefaultSchematic();
     s.elementChange = { needed: true, element: 'nature' };
     const c = schematicCost(s, DEFAULT_COSTS);
-    expect(c.rePerk).toBe(1500);
-    expect(c.ampUp).toBe(1200);
+    expect(c.ampUp).toBe(1800);
+    expect(c.rePerk).toBe(345 * 6);
   });
-  it('element change energy splits over three elementals', () => {
+  it('element change energy adds 600 each elemental (no extra rePerk)', () => {
     const s = makeDefaultSchematic();
     s.elementChange = { needed: true, element: 'energy' };
     const c = schematicCost(s, DEFAULT_COSTS);
-    expect(c.fireUp).toBe(400);
-    expect(c.frostUp).toBe(400);
-    expect(c.ampUp).toBe(400);
+    expect(c.fireUp).toBe(600);
+    expect(c.frostUp).toBe(600);
+    expect(c.ampUp).toBe(600);
+    expect(c.rePerk).toBe(345 * 6);
+  });
+  it('element change physical adds 1500 rePerk (no elemental component)', () => {
+    const s = makeDefaultSchematic();
+    s.elementChange = { needed: true, element: 'physical' };
+    const c = schematicCost(s, DEFAULT_COSTS);
+    expect(c.rePerk).toBe(345 * 6 + 1500);
+    expect(c.fireUp).toBeUndefined();
+    expect(c.frostUp).toBeUndefined();
+    expect(c.ampUp).toBeUndefined();
   });
 });
 
@@ -116,9 +129,9 @@ describe('totals & shortage', () => {
     expect(totalCost([a, b], DEFAULT_COSTS).pureDropsOfRain).toBe(400);
   });
   it('shortage clamps at zero', () => {
-    expect(shortage({ perkUp: 100, rePerk: 50 }, { perkUp: 30, rePerk: 200 })).toEqual({ perkUp: 70 });
+    expect(shortage({ uncommonPerkUp: 100, rePerk: 50 }, { uncommonPerkUp: 30, rePerk: 200 })).toEqual({ uncommonPerkUp: 70 });
   });
   it('addTotals merges keys', () => {
-    expect(addTotals({ perkUp: 1 }, { perkUp: 2, rePerk: 3 })).toEqual({ perkUp: 3, rePerk: 3 });
+    expect(addTotals({ uncommonPerkUp: 1 }, { uncommonPerkUp: 2, rePerk: 3 })).toEqual({ uncommonPerkUp: 3, rePerk: 3 });
   });
 });

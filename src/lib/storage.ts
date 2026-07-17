@@ -24,8 +24,9 @@ function isCostConfig(v: unknown): boolean {
   return Array.isArray(v.levelTiers)
     && Array.isArray(v.perkSteps)
     && typeof v.rePerkChange === 'number'
-    && typeof v.elementChangeRePerk === 'number'
-    && typeof v.elementChangeElemental === 'number';
+    && typeof v.elementChangeElemental === 'number'
+    && typeof v.elementChangeEnergyEach === 'number'
+    && typeof v.elementChangePhysicalRePerk === 'number';
 }
 
 function isSchematic(v: unknown): boolean {
