@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { AlertTriangle, Package, Sigma, Swords } from 'lucide-react';
 import { useAppState } from './state/AppStateContext';
+import SchematicsSection from './components/SchematicsSection';
 
 type Tab = 'schematics' | 'totals' | 'inventory';
 
@@ -39,7 +40,7 @@ export default function App() {
         ))}
       </nav>
       <main className="mx-6 mb-6 rounded-b rounded-tr bg-zinc-900 p-6">
-        {tab === 'schematics' && <p className="text-zinc-400">Schematics section (Task 7-8)</p>}
+        {tab === 'schematics' && <SchematicsSection />}
         {tab === 'totals' && <p className="text-zinc-400">Totals section (Task 9)</p>}
         {tab === 'inventory' && <p className="text-zinc-400">Inventory section (Task 10)</p>}
       </main>
