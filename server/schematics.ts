@@ -123,8 +123,10 @@ export function parseCampaignSchematics(
         log(`Unknown alteration: ${aid}`);
       }
     }
-    const baseKey = tokens.filter((t) => !SUFFIX_TOKENS.has(t)).join('_');
-    out.push({ templateId: tpl, name: names[baseKey] ?? prettifyName(slug), rarity, level, perks, unknownAlterations });
+    const baseTokens = tokens.filter((t) => !SUFFIX_TOKENS.has(t));
+    const baseKey = baseTokens.join('_');
+    const exactKey = rarityToken ? `${baseKey}_${rarityToken}` : baseKey;
+    out.push({ templateId: tpl, name: names[exactKey] ?? names[baseKey] ?? prettifyName(slug), rarity, level, perks, unknownAlterations });
   }
   return out.sort((a, b) => b.level - a.level);
 }

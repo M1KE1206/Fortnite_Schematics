@@ -109,4 +109,14 @@ describe('name lookup', () => {
     );
     expect(result[0].name).toBe('Launcher Grenade');
   });
+
+  it('prefers rarity-specific names over base names', () => {
+    const names = { assault_auto: 'Base Name', assault_auto_sr: 'Legendary Name' };
+    const result = parseCampaignSchematics(
+      profileWith({ a: { templateId: 'Schematic:sid_assault_auto_sr_crystal_t05', attributes: { level: 20 } } }),
+      undefined,
+      names,
+    );
+    expect(result[0].name).toBe('Legendary Name');
+  });
 });

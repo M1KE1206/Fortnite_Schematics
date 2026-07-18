@@ -12,16 +12,24 @@ let m;
 while ((m = re.exec(xml)) !== null) {
   const [, nameSlug, sid] = m;
   const sidTokens = sid.toLowerCase().split('_');
-  if (RARITY.has(sidTokens[sidTokens.length - 1])) sidTokens.pop();
-  const key = sidTokens.join('_');
+  const rarityToken = RARITY.has(sidTokens[sidTokens.length - 1]) ? sidTokens[sidTokens.length - 1] : null;
+  const sidTokensWithoutRarity = rarityToken ? sidTokens.slice(0, -1) : sidTokens;
+  const baseKey = sidTokensWithoutRarity.join('_');
+  const exactKey = rarityToken ? `${baseKey}_${rarityToken}` : baseKey;
+
   const nameTokens = nameSlug.split('-');
   if (RARITY.has(nameTokens[0])) nameTokens.shift();
   const name = nameTokens.map((w) => (w ? w[0].toUpperCase() + w.slice(1) : w)).join(' ');
-  if (map[key] && map[key] !== name) {
+
+  // Always write exact key (no conflicts possible)
+  map[exactKey] = name;
+
+  // Write base key only if it doesn't exist yet (first-wins for base keys)
+  if (!map[baseKey]) {
+    map[baseKey] = name;
+  } else if (map[baseKey] !== name) {
     skipped++;
-    continue;
   }
-  map[key] = name;
 }
 
 const sorted = Object.fromEntries(Object.entries(map).sort(([a], [b]) => a.localeCompare(b)));
