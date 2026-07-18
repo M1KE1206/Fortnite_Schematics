@@ -59,3 +59,14 @@ export async function toDataUrl(url: string): Promise<string> {
     return url;
   }
 }
+
+export async function findIconUrl(name: string): Promise<string | null> {
+  try {
+    const results = await searchWikiIcons(`${name} schematic`);
+    const hit = results.find((r) => r.thumbnailUrl);
+    if (!hit?.thumbnailUrl) return null;
+    return await toDataUrl(hit.thumbnailUrl);
+  } catch {
+    return null;
+  }
+}

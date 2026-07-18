@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { buildSearchUrl, parseSearchResponse, searchWikiIcons, toDataUrl } from './wiki';
+import { buildSearchUrl, parseSearchResponse, searchWikiIcons, toDataUrl, findIconUrl } from './wiki';
 
 afterEach(() => vi.unstubAllGlobals());
 
@@ -73,5 +73,25 @@ describe('toDataUrl', () => {
   it('falls back to original url when response is not ok', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false }));
     await expect(toDataUrl('https://img/n.png')).resolves.toBe('https://img/n.png');
+  });
+});
+
+describe('findIconUrl', () => {
+  it('returns the first thumbnail (hotlink fallback when conversion fails)', async () => {
+    const searchResponse = {
+      query: { pages: { '1': { index: 1, title: 'Swan', thumbnail: { source: 'https://img/s.png' } } } },
+    };
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValueOnce({ ok: true, json: async () => searchResponse }).mockRejectedValueOnce(new TypeError('cors')),
+    );
+    await expect(findIconUrl('Swan')).resolves.toBe('https://img/s.png');
+  });
+
+  it('returns null on wiki failure or empty results', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new TypeError('down')));
+    await expect(findIconUrl('Swan')).resolves.toBeNull();
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => ({}) }));
+    await expect(findIconUrl('Swan')).resolves.toBeNull();
   });
 });

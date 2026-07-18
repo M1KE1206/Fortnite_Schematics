@@ -49,7 +49,7 @@ export default function SchematicCard({ schematic, onEdit, onDelete }: Props) {
         {schematic.perkSlots.map((slot, i) => (
           <span
             key={i}
-            title={`${i === 5 ? 'Element slot' : `Perk ${i + 1}`}: ${
+            title={`Perk ${i + 1}: ${
               slot.currentPerk || slot.targetPerk
                 ? `${PERK_LABELS[slot.currentPerk ?? ''] ?? '(none)'} → ${PERK_LABELS[slot.targetPerk ?? ''] ?? '(none)'} (${slot.currentRarity} → ${slot.targetRarity})`
                 : `${slot.currentRarity} → ${slot.targetRarity}`

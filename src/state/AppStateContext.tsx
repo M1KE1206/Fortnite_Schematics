@@ -4,6 +4,7 @@ import { loadState, saveState, type AppState } from '../lib/storage';
 interface Ctx {
   state: AppState;
   update: (patch: Partial<AppState>) => void;
+  mutate: (fn: (s: AppState) => AppState) => void;
   saveFailed: boolean;
 }
 
@@ -23,7 +24,12 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
   }, [state]);
 
   const value = useMemo<Ctx>(
-    () => ({ state, saveFailed, update: (patch) => setState((s) => ({ ...s, ...patch })) }),
+    () => ({
+      state,
+      saveFailed,
+      update: (patch) => setState((s) => ({ ...s, ...patch })),
+      mutate: (fn) => setState(fn),
+    }),
     [state, saveFailed],
   );
   return <AppStateContext.Provider value={value}>{children}</AppStateContext.Provider>;

@@ -2,13 +2,14 @@ import { useState } from 'react';
 import { Download, Plus } from 'lucide-react';
 import type { Schematic } from '../types';
 import { makeDefaultSchematic } from '../lib/calculator';
+import { findIconUrl } from '../lib/wiki';
 import { useAppState } from '../state/AppStateContext';
 import SchematicCard from './SchematicCard';
 import SchematicForm from './SchematicForm';
 import ImportModal from './ImportModal';
 
 export default function SchematicsSection() {
-  const { state, update } = useAppState();
+  const { state, update, mutate } = useAppState();
   const [editing, setEditing] = useState<Schematic | null>(null);
   const [showImport, setShowImport] = useState(false);
 
@@ -23,6 +24,23 @@ export default function SchematicsSection() {
   function remove(id: string, name: string) {
     if (window.confirm(`Delete "${name}"?`)) {
       update({ schematics: state.schematics.filter((x) => x.id !== id) });
+    }
+  }
+
+  function handleImported(created: Schematic[]) {
+    update({ schematics: [...state.schematics, ...created] });
+    void fetchIconsFor(created);
+  }
+
+  async function fetchIconsFor(created: Schematic[]) {
+    for (const item of created) {
+      const icon = await findIconUrl(item.name);
+      if (!icon) continue;
+      mutate((s) => ({
+        ...s,
+        icons: { ...s.icons, [item.name.toLowerCase()]: icon },
+        schematics: s.schematics.map((x) => (x.id === item.id ? { ...x, iconUrl: icon } : x)),
+      }));
     }
   }
 
@@ -57,7 +75,7 @@ export default function SchematicsSection() {
         </div>
       )}
       {editing && <SchematicForm initial={editing} onSave={save} onCancel={() => setEditing(null)} />}
-      {showImport && <ImportModal onClose={() => setShowImport(false)} />}
+      {showImport && <ImportModal onClose={() => setShowImport(false)} onImported={handleImported} />}
     </div>
   );
 }

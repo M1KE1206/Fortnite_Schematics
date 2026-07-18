@@ -7,8 +7,8 @@ import { makeDefaultSchematic } from '../lib/calculator';
 import { EpicSyncError, fetchEpicSchematics, type ImportedSchematic } from '../lib/epicSync';
 import { useAppState } from '../state/AppStateContext';
 
-export default function ImportModal({ onClose }: { onClose: () => void }) {
-  const { state, update } = useAppState();
+export default function ImportModal({ onClose, onImported }: { onClose: () => void; onImported: (created: Schematic[]) => void }) {
+  const { state } = useAppState();
   const [items, setItems] = useState<ImportedSchematic[] | null>(null);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [error, setError] = useState('');
@@ -51,7 +51,7 @@ export default function ImportModal({ onClose }: { onClose: () => void }) {
         });
         return s;
       });
-    update({ schematics: [...state.schematics, ...created] });
+    onImported(created);
     onClose();
   }
 

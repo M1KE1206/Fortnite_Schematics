@@ -42,7 +42,7 @@ function PerkSelect({
 }
 
 export default function PerkSlotEditor({ slot, index, onChange }: Props) {
-  const label = index === 5 ? 'Element slot' : `Perk ${index + 1}`;
+  const label = `Perk ${index + 1}`;
   const cur = slot.currentPerk ?? null;
   const tgt = slot.targetPerk ?? null;
   const changed = cur !== null && tgt !== null && cur !== tgt;
