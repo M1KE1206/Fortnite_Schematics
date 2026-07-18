@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { DEFAULT_COSTS } from '../data/costs';
 import {
-  levelUpCost, perkUpgradeCost, schematicCost, totalCost, shortage, addTotals, makeDefaultSchematic, slotNeedsReroll,
+  levelUpCost, perkUpgradeCost, schematicCost, totalCost, shortage, addTotals, makeDefaultSchematic, slotChangeCost,
 } from './calculator';
 
 describe('levelUpCost', () => {
@@ -81,45 +81,6 @@ describe('schematicCost', () => {
     s.perkSlots[1].needsReroll = true;
     expect(schematicCost(s, DEFAULT_COSTS).rePerk).toBe(345 * 6 + 600 * 2);
   });
-  it('element change fire adds fireUp only (no extra rePerk)', () => {
-    const s = makeDefaultSchematic();
-    s.elementChange = { needed: true, element: 'fire' };
-    const c = schematicCost(s, DEFAULT_COSTS);
-    expect(c.fireUp).toBe(1800);
-    expect(c.rePerk).toBe(345 * 6);
-  });
-  it('element change water adds frostUp only (no extra rePerk)', () => {
-    const s = makeDefaultSchematic();
-    s.elementChange = { needed: true, element: 'water' };
-    const c = schematicCost(s, DEFAULT_COSTS);
-    expect(c.frostUp).toBe(1800);
-    expect(c.rePerk).toBe(345 * 6);
-  });
-  it('element change nature adds ampUp only (no extra rePerk)', () => {
-    const s = makeDefaultSchematic();
-    s.elementChange = { needed: true, element: 'nature' };
-    const c = schematicCost(s, DEFAULT_COSTS);
-    expect(c.ampUp).toBe(1800);
-    expect(c.rePerk).toBe(345 * 6);
-  });
-  it('element change energy adds 600 each elemental (no extra rePerk)', () => {
-    const s = makeDefaultSchematic();
-    s.elementChange = { needed: true, element: 'energy' };
-    const c = schematicCost(s, DEFAULT_COSTS);
-    expect(c.fireUp).toBe(600);
-    expect(c.frostUp).toBe(600);
-    expect(c.ampUp).toBe(600);
-    expect(c.rePerk).toBe(345 * 6);
-  });
-  it('element change physical adds 1500 rePerk (no elemental component)', () => {
-    const s = makeDefaultSchematic();
-    s.elementChange = { needed: true, element: 'physical' };
-    const c = schematicCost(s, DEFAULT_COSTS);
-    expect(c.rePerk).toBe(345 * 6 + 1500);
-    expect(c.fireUp).toBeUndefined();
-    expect(c.frostUp).toBeUndefined();
-    expect(c.ampUp).toBeUndefined();
-  });
 });
 
 describe('totals & shortage', () => {
@@ -136,15 +97,15 @@ describe('totals & shortage', () => {
   });
 });
 
-describe('perk-based rerolls', () => {
-  it('counts reroll when current and target perks differ', () => {
+describe('slot change costs', () => {
+  it('counts 600 rePerk when normal perks differ', () => {
     const s = makeDefaultSchematic();
     s.perkSlots[0].currentPerk = 'damage';
     s.perkSlots[0].targetPerk = 'critRating';
     expect(schematicCost(s, DEFAULT_COSTS).rePerk).toBe(2070 + 600);
   });
 
-  it('no reroll when perks are equal, even with legacy flag set', () => {
+  it('no cost when perks are equal, even with legacy flag set', () => {
     const s = makeDefaultSchematic();
     s.perkSlots[0].currentPerk = 'critRating';
     s.perkSlots[0].targetPerk = 'critRating';
@@ -152,7 +113,7 @@ describe('perk-based rerolls', () => {
     expect(schematicCost(s, DEFAULT_COSTS).rePerk).toBe(2070);
   });
 
-  it('no reroll when only one perk is set, even with legacy flag', () => {
+  it('no cost when only one perk is set, even with legacy flag', () => {
     const s = makeDefaultSchematic();
     s.perkSlots[0].currentPerk = 'damage';
     s.perkSlots[0].needsReroll = true;
@@ -171,6 +132,49 @@ describe('perk-based rerolls', () => {
     delete legacy.currentPerk;
     delete legacy.targetPerk;
     s.perkSlots[0].needsReroll = true;
-    expect(slotNeedsReroll(s.perkSlots[0])).toBe(true);
+    expect(slotChangeCost(s.perkSlots[0], DEFAULT_COSTS)).toEqual({ rePerk: 600 });
+  });
+
+  it('element change to fire costs 1800 fireUp in any slot', () => {
+    const s = makeDefaultSchematic();
+    s.perkSlots[0].currentPerk = 'elemPhysical';
+    s.perkSlots[0].targetPerk = 'elemFire';
+    const c = schematicCost(s, DEFAULT_COSTS);
+    expect(c.fireUp).toBe(1800);
+    expect(c.rePerk).toBe(2070);
+  });
+
+  it('element to element uses target cost (fire to water = 1800 frostUp)', () => {
+    const s = makeDefaultSchematic();
+    s.perkSlots[2].currentPerk = 'elemFire';
+    s.perkSlots[2].targetPerk = 'elemWater';
+    const c = schematicCost(s, DEFAULT_COSTS);
+    expect(c.frostUp).toBe(1800);
+    expect(c.fireUp).toBeUndefined();
+  });
+
+  it('element change to energy costs 600 of each elemental', () => {
+    const s = makeDefaultSchematic();
+    s.perkSlots[5].currentPerk = 'elemPhysical';
+    s.perkSlots[5].targetPerk = 'elemEnergy';
+    const c = schematicCost(s, DEFAULT_COSTS);
+    expect(c.fireUp).toBe(600);
+    expect(c.frostUp).toBe(600);
+    expect(c.ampUp).toBe(600);
+  });
+
+  it('element change to physical costs 1500 rePerk', () => {
+    const s = makeDefaultSchematic();
+    s.perkSlots[5].currentPerk = 'elemFire';
+    s.perkSlots[5].targetPerk = 'elemPhysical';
+    expect(schematicCost(s, DEFAULT_COSTS).rePerk).toBe(2070 + 1500);
+  });
+
+  it('elementChange field is no longer read by the calculator', () => {
+    const s = makeDefaultSchematic();
+    s.elementChange = { needed: true, element: 'fire' };
+    const c = schematicCost(s, DEFAULT_COSTS);
+    expect(c.fireUp).toBeUndefined();
+    expect(c.rePerk).toBe(2070);
   });
 });

@@ -27,8 +27,17 @@ export const PERKS: PerkDef[] = [
   { id: 'knockback', label: 'Knockback', group: 'Sixth perk' },
   { id: 'causesAffliction', label: 'Causes Affliction (6s)', group: 'Sixth perk' },
   { id: 'headshotEnergy', label: 'Headshots grant Energy', group: 'Sixth perk' },
+  { id: 'elemFire', label: 'Element: Fire', group: 'Element' },
+  { id: 'elemWater', label: 'Element: Water', group: 'Element' },
+  { id: 'elemNature', label: 'Element: Nature', group: 'Element' },
+  { id: 'elemEnergy', label: 'Element: Energy', group: 'Element' },
+  { id: 'elemPhysical', label: 'Element: Physical', group: 'Element' },
 ];
 
 export const PERK_LABELS: Record<string, string> = Object.fromEntries(
   PERKS.map((p) => [p.id, p.label]),
+);
+
+export const ELEMENT_PERK_IDS = new Set(
+  PERKS.filter((p) => p.group === 'Element').map((p) => p.id),
 );

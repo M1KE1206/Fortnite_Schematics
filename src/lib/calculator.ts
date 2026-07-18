@@ -1,6 +1,5 @@
 import { RARITIES } from '../types';
 import type { CostConfig, Inventory, PerkSlot, Rarity, ResourceKey, ResourceTotals, Schematic } from '../types';
-import { ELEMENT_RESOURCE } from '../data/costs';
 
 export function addTotals(...totals: ResourceTotals[]): ResourceTotals {
   const out: ResourceTotals = {};
@@ -40,12 +39,31 @@ export function perkUpgradeCost(from: Rarity, to: Rarity, costs: CostConfig): Re
   return addTotals(...parts);
 }
 
-export function slotNeedsReroll(slot: PerkSlot): boolean {
+export function slotChangeCost(slot: PerkSlot, costs: CostConfig): ResourceTotals {
   const cur = slot.currentPerk ?? null;
   const tgt = slot.targetPerk ?? null;
-  if (cur !== null && tgt !== null) return cur !== tgt;
-  if (cur === null && tgt === null) return slot.needsReroll;
-  return false;
+  if (cur === null && tgt === null) {
+    return slot.needsReroll ? { rePerk: costs.rePerkChange } : {};
+  }
+  if (cur === null || tgt === null || cur === tgt) return {};
+  switch (tgt) {
+    case 'elemFire':
+      return { fireUp: costs.elementChangeElemental };
+    case 'elemWater':
+      return { frostUp: costs.elementChangeElemental };
+    case 'elemNature':
+      return { ampUp: costs.elementChangeElemental };
+    case 'elemEnergy':
+      return {
+        fireUp: costs.elementChangeEnergyEach,
+        frostUp: costs.elementChangeEnergyEach,
+        ampUp: costs.elementChangeEnergyEach,
+      };
+    case 'elemPhysical':
+      return { rePerk: costs.elementChangePhysicalRePerk };
+    default:
+      return { rePerk: costs.rePerkChange };
+  }
 }
 
 export function schematicCost(s: Schematic, costs: CostConfig): ResourceTotals {
@@ -53,21 +71,7 @@ export function schematicCost(s: Schematic, costs: CostConfig): ResourceTotals {
   for (const slot of s.perkSlots) {
     if (!slot.enabled) continue;
     parts.push(perkUpgradeCost(slot.currentRarity, slot.targetRarity, costs));
-    if (slotNeedsReroll(slot)) parts.push({ rePerk: costs.rePerkChange });
-  }
-  if (s.elementChange.needed && s.elementChange.element) {
-    const el = s.elementChange.element;
-    if (el === 'energy') {
-      parts.push({
-        fireUp: costs.elementChangeEnergyEach,
-        frostUp: costs.elementChangeEnergyEach,
-        ampUp: costs.elementChangeEnergyEach,
-      });
-    } else if (el === 'physical') {
-      parts.push({ rePerk: costs.elementChangePhysicalRePerk });
-    } else {
-      parts.push({ [ELEMENT_RESOURCE[el]]: costs.elementChangeElemental });
-    }
+    parts.push(slotChangeCost(slot, costs));
   }
   return addTotals(...parts);
 }
