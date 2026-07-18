@@ -143,4 +143,22 @@ describe('elementChange migration', () => {
     expect(loaded.schematics[0].perkSlots[5].targetPerk).toBe('elemWater');
     expect(loaded.schematics[0].elementChange.needed).toBe(false);
   });
+
+  it('migrates a legacy physical element change cost-equivalently', () => {
+    const schematic = makeDefaultSchematic();
+    schematic.name = 'Old trap with physical';
+    schematic.elementChange = { needed: true, element: 'physical' };
+    const state = {
+      schematics: [schematic],
+      inventory: {},
+      costs: structuredClone(DEFAULT_COSTS),
+      icons: {},
+    };
+    localStorage.setItem('stw-tracker:v1:state', JSON.stringify({ version: 1, state }));
+    const loaded = loadState();
+    const slot = loaded.schematics[0].perkSlots[5];
+    expect(slot.currentPerk).toBe('elemFire');
+    expect(slot.targetPerk).toBe('elemPhysical');
+    expect(loaded.schematics[0].elementChange.needed).toBe(false);
+  });
 });

@@ -16,6 +16,7 @@ const ELEMENT_TO_PERK: Record<string, string> = {
   water: 'elemWater',
   nature: 'elemNature',
   energy: 'elemEnergy',
+  physical: 'elemPhysical',
 };
 
 function migrateSchematic(s: Schematic): Schematic {
@@ -26,7 +27,8 @@ function migrateSchematic(s: Schematic): Schematic {
   const perkSlots = s.perkSlots.map((slot, i) => {
     if (i !== 5) return slot;
     if ((slot.currentPerk ?? null) !== null || (slot.targetPerk ?? null) !== null) return slot;
-    return { ...slot, currentPerk: 'elemPhysical', targetPerk: target };
+    const currentPerk = target === 'elemPhysical' ? 'elemFire' : 'elemPhysical';
+    return { ...slot, currentPerk, targetPerk: target };
   });
   return { ...s, perkSlots, elementChange: { needed: false, element: null } };
 }
