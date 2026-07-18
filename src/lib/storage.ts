@@ -11,6 +11,30 @@ export interface AppState {
 const KEY = 'stw-tracker:v1:state';
 const VERSION = 1;
 
+const ELEMENT_TO_PERK: Record<string, string> = {
+  fire: 'elemFire',
+  water: 'elemWater',
+  nature: 'elemNature',
+  energy: 'elemEnergy',
+};
+
+function migrateSchematic(s: Schematic): Schematic {
+  const el = s.elementChange;
+  if (!el?.needed || !el.element) return s;
+  const target = ELEMENT_TO_PERK[el.element];
+  if (!target) return s;
+  const perkSlots = s.perkSlots.map((slot, i) => {
+    if (i !== 5) return slot;
+    if ((slot.currentPerk ?? null) !== null || (slot.targetPerk ?? null) !== null) return slot;
+    return { ...slot, currentPerk: 'elemPhysical', targetPerk: target };
+  });
+  return { ...s, perkSlots, elementChange: { needed: false, element: null } };
+}
+
+function migrateState(state: AppState): AppState {
+  return { ...state, schematics: state.schematics.map(migrateSchematic) };
+}
+
 function defaults(): AppState {
   return { schematics: [], inventory: {}, costs: structuredClone(DEFAULT_COSTS), icons: {} };
 }
@@ -52,7 +76,7 @@ export function loadState(): AppState {
     if (!raw) return defaults();
     const parsed = JSON.parse(raw) as { version?: number; state?: unknown };
     if (parsed.version !== VERSION || !isPlainObject(parsed.state)) return defaults();
-    if (isAppState(parsed.state)) return parsed.state;
+    if (isAppState(parsed.state)) return migrateState(parsed.state);
 
     // Envelope is valid but the state failed full validation - salvage what we can
     // instead of discarding everything.
@@ -61,7 +85,7 @@ export function loadState(): AppState {
     const inventory = isPlainObject(state.inventory) ? (state.inventory as Inventory) : {};
     const costs = isCostConfig(state.costs) ? (state.costs as CostConfig) : structuredClone(DEFAULT_COSTS);
     const icons = isPlainObject(state.icons) ? (state.icons as Record<string, string>) : {};
-    return { schematics, inventory, costs, icons };
+    return migrateState({ schematics, inventory, costs, icons });
   } catch {
     return defaults();
   }
@@ -90,5 +114,5 @@ export function importJson(json: string): AppState {
   if (parsed.version !== VERSION || !isAppState(parsed.state)) {
     throw new Error('File is not a valid STW Tracker export.');
   }
-  return parsed.state;
+  return migrateState(parsed.state);
 }

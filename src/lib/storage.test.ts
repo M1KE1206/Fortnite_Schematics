@@ -106,3 +106,41 @@ describe('storage', () => {
     expect(saveState(state)).toBe(false);
   });
 });
+
+describe('elementChange migration', () => {
+  function stateWithElement(element: 'fire' | 'energy') {
+    const schematic = makeDefaultSchematic();
+    schematic.name = 'Old trap';
+    schematic.elementChange = { needed: true, element };
+    return {
+      schematics: [schematic],
+      inventory: {},
+      costs: structuredClone(DEFAULT_COSTS),
+      icons: {},
+    };
+  }
+
+  it('migrates elementChange to slot 5 perks on load', () => {
+    localStorage.setItem('stw-tracker:v1:state', JSON.stringify({ version: 1, state: stateWithElement('fire') }));
+    const loaded = loadState();
+    const slot = loaded.schematics[0].perkSlots[5];
+    expect(slot.currentPerk).toBe('elemPhysical');
+    expect(slot.targetPerk).toBe('elemFire');
+    expect(loaded.schematics[0].elementChange.needed).toBe(false);
+  });
+
+  it('migrates energy on import and leaves untouched schematics alone', () => {
+    const json = JSON.stringify({ version: 1, state: stateWithElement('energy') });
+    const imported = importJson(json);
+    expect(imported.schematics[0].perkSlots[5].targetPerk).toBe('elemEnergy');
+  });
+
+  it('does not overwrite already-set slot 5 perks', () => {
+    const state = stateWithElement('fire');
+    state.schematics[0].perkSlots[5].targetPerk = 'elemWater';
+    localStorage.setItem('stw-tracker:v1:state', JSON.stringify({ version: 1, state }));
+    const loaded = loadState();
+    expect(loaded.schematics[0].perkSlots[5].targetPerk).toBe('elemWater');
+    expect(loaded.schematics[0].elementChange.needed).toBe(false);
+  });
+});
