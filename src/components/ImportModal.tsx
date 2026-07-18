@@ -44,9 +44,10 @@ export default function ImportModal({ onClose }: { onClose: () => void }) {
         const s = makeDefaultSchematic();
         s.name = item.name;
         s.currentLevel = item.level;
-        item.perks.forEach((perk, i) => {
-          if (i > 5) return;
-          s.perkSlots[i] = { ...s.perkSlots[i], currentPerk: perk.perkId, currentRarity: perk.rarity };
+        s.perkSlots = s.perkSlots.map((slot, i) => {
+          const perk = item.perks[i];
+          if (!perk) return { ...slot, enabled: false };
+          return { ...slot, currentPerk: perk.perkId, currentRarity: perk.rarity };
         });
         return s;
       });
