@@ -4,6 +4,7 @@ import { DEFAULT_COSTS, RESOURCES } from '../data/costs';
 import { exportJson, importJson } from '../lib/storage';
 import { useAppState } from '../state/AppStateContext';
 import { RARITY_LABELS, RARITIES } from '../types';
+import EpicSyncSection from './EpicSyncSection';
 
 function NumberField({ label, value, onChange }: { label: string; value: number; onChange: (n: number) => void }) {
   return (
@@ -49,7 +50,9 @@ export default function InventorySection() {
   const stepNames = RARITIES.slice(0, 4).map((r, i) => `${RARITY_LABELS[r]} → ${RARITY_LABELS[RARITIES[i + 1]]}`);
 
   return (
-    <div className="grid gap-8 lg:grid-cols-2">
+    <div className="space-y-8">
+      <EpicSyncSection />
+      <div className="grid gap-8 lg:grid-cols-2">
       <section>
         <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-zinc-400">Your inventory</h2>
         <div className="space-y-2">
@@ -175,6 +178,7 @@ export default function InventorySection() {
           </div>
         </section>
       </div>
+    </div>
     </div>
   );
 }
