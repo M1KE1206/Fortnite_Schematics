@@ -1,5 +1,5 @@
 import { RARITIES } from '../types';
-import type { CostConfig, Inventory, Rarity, ResourceKey, ResourceTotals, Schematic } from '../types';
+import type { CostConfig, Inventory, PerkSlot, Rarity, ResourceKey, ResourceTotals, Schematic } from '../types';
 import { ELEMENT_RESOURCE } from '../data/costs';
 
 export function addTotals(...totals: ResourceTotals[]): ResourceTotals {
@@ -40,12 +40,20 @@ export function perkUpgradeCost(from: Rarity, to: Rarity, costs: CostConfig): Re
   return addTotals(...parts);
 }
 
+export function slotNeedsReroll(slot: PerkSlot): boolean {
+  const cur = slot.currentPerk ?? null;
+  const tgt = slot.targetPerk ?? null;
+  if (cur !== null && tgt !== null) return cur !== tgt;
+  if (cur === null && tgt === null) return slot.needsReroll;
+  return false;
+}
+
 export function schematicCost(s: Schematic, costs: CostConfig): ResourceTotals {
   const parts: ResourceTotals[] = [levelUpCost(s.currentLevel, s.targetLevel, costs)];
   for (const slot of s.perkSlots) {
     if (!slot.enabled) continue;
     parts.push(perkUpgradeCost(slot.currentRarity, slot.targetRarity, costs));
-    if (slot.needsReroll) parts.push({ rePerk: costs.rePerkChange });
+    if (slotNeedsReroll(slot)) parts.push({ rePerk: costs.rePerkChange });
   }
   if (s.elementChange.needed && s.elementChange.element) {
     const el = s.elementChange.element;
@@ -89,6 +97,8 @@ export function makeDefaultSchematic(): Schematic {
       currentRarity: 'white' as Rarity,
       targetRarity: 'gold' as Rarity,
       needsReroll: false,
+      currentPerk: null,
+      targetPerk: null,
     })),
     elementChange: { needed: false, element: null },
   };

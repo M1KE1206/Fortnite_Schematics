@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { DEFAULT_COSTS } from '../data/costs';
 import {
-  levelUpCost, perkUpgradeCost, schematicCost, totalCost, shortage, addTotals, makeDefaultSchematic,
+  levelUpCost, perkUpgradeCost, schematicCost, totalCost, shortage, addTotals, makeDefaultSchematic, slotNeedsReroll,
 } from './calculator';
 
 describe('levelUpCost', () => {
@@ -133,5 +133,44 @@ describe('totals & shortage', () => {
   });
   it('addTotals merges keys', () => {
     expect(addTotals({ uncommonPerkUp: 1 }, { uncommonPerkUp: 2, rePerk: 3 })).toEqual({ uncommonPerkUp: 3, rePerk: 3 });
+  });
+});
+
+describe('perk-based rerolls', () => {
+  it('counts reroll when current and target perks differ', () => {
+    const s = makeDefaultSchematic();
+    s.perkSlots[0].currentPerk = 'damage';
+    s.perkSlots[0].targetPerk = 'critRating';
+    expect(schematicCost(s, DEFAULT_COSTS).rePerk).toBe(2070 + 600);
+  });
+
+  it('no reroll when perks are equal, even with legacy flag set', () => {
+    const s = makeDefaultSchematic();
+    s.perkSlots[0].currentPerk = 'critRating';
+    s.perkSlots[0].targetPerk = 'critRating';
+    s.perkSlots[0].needsReroll = true;
+    expect(schematicCost(s, DEFAULT_COSTS).rePerk).toBe(2070);
+  });
+
+  it('no reroll when only one perk is set, even with legacy flag', () => {
+    const s = makeDefaultSchematic();
+    s.perkSlots[0].currentPerk = 'damage';
+    s.perkSlots[0].needsReroll = true;
+    expect(schematicCost(s, DEFAULT_COSTS).rePerk).toBe(2070);
+  });
+
+  it('legacy needsReroll still counts when no perks are set', () => {
+    const s = makeDefaultSchematic();
+    s.perkSlots[0].needsReroll = true;
+    expect(schematicCost(s, DEFAULT_COSTS).rePerk).toBe(2070 + 600);
+  });
+
+  it('handles legacy stored slots without perk fields', () => {
+    const s = makeDefaultSchematic();
+    const legacy = s.perkSlots[0] as Partial<typeof s.perkSlots[0]>;
+    delete legacy.currentPerk;
+    delete legacy.targetPerk;
+    s.perkSlots[0].needsReroll = true;
+    expect(slotNeedsReroll(s.perkSlots[0])).toBe(true);
   });
 });

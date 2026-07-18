@@ -33,6 +33,8 @@ export interface PerkSlot {
   currentRarity: Rarity;
   targetRarity: Rarity;
   needsReroll: boolean;
+  currentPerk: string | null;
+  targetPerk: string | null;
 }
 
 export interface Schematic {
