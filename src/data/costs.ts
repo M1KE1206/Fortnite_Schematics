@@ -1,4 +1,4 @@
-import type { CostConfig, ElementType, ResourceKey } from '../types';
+import type { CostConfig, ResourceKey } from '../types';
 
 export const DEFAULT_COSTS: CostConfig = {
   levelTiers: [
@@ -37,9 +37,3 @@ export const RESOURCES: { key: ResourceKey; label: string; group: 'evolution' | 
   { key: 'epicFlux', label: 'Epic Flux', group: 'upgrade' },
   { key: 'legendaryFlux', label: 'Legendary Flux', group: 'upgrade' },
 ];
-
-export const ELEMENT_RESOURCE: Record<Exclude<ElementType, 'energy' | 'physical'>, ResourceKey> = {
-  fire: 'fireUp',
-  water: 'frostUp',
-  nature: 'ampUp',
-};
