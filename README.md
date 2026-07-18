@@ -12,6 +12,16 @@ across your whole collection, with inventory tracking and shortage overview.
 - Aggregated totals + inventory shortage view
 - All cost values editable in Settings (defaults follow current in-game values)
 - Data stored in localStorage; JSON export/import for backup
+- Optional one-click inventory sync from your Epic account (local only)
+
+## Epic account sync (optional)
+
+Link your Epic account once (Inventory & Settings tab) and pull your STW
+evolution and perk materials with one click. Runs entirely on your machine:
+the dev server talks to Epic's (unofficial) services and stores a revocable
+device auth in `.stw-auth.json` (gitignored, never leaves your PC). Note:
+these are the same unofficial endpoints community tools use - they may break
+if Epic changes them.
 
 ## Development
 
