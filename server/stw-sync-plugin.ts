@@ -1,5 +1,6 @@
 import type { ServerResponse } from 'node:http';
 import type { Connect, Plugin } from 'vite';
+import type { DeviceAuth } from './epic.js';
 import {
   accessTokenFromDeviceAuth,
   createDeviceAuth,
@@ -8,6 +9,7 @@ import {
   parseCampaignResources,
   queryCampaignProfile,
 } from './epic.js';
+import { parseCampaignSchematics } from './schematics.js';
 import { deleteAuth, readAuth, writeAuth } from './authStore.js';
 
 function sendJson(res: ServerResponse, status: number, data: unknown): void {
@@ -36,6 +38,24 @@ function readBody(req: Connect.IncomingMessage): Promise<Record<string, unknown>
 export function stwSyncPlugin(): Plugin {
   let root = process.cwd();
 
+  async function requireToken(res: ServerResponse): Promise<{ token: string; auth: DeviceAuth } | null> {
+    const auth = readAuth(root);
+    if (!auth) {
+      sendJson(res, 401, { error: 'No Epic account linked', needsRelink: true });
+      return null;
+    }
+    try {
+      return { token: await accessTokenFromDeviceAuth(auth), auth };
+    } catch (e) {
+      if (e instanceof EpicApiError && (e.status === 400 || e.status === 401)) {
+        deleteAuth(root);
+        sendJson(res, 401, { error: 'Epic link expired - link your account again', needsRelink: true });
+        return null;
+      }
+      throw e;
+    }
+  }
+
   async function handle(req: Connect.IncomingMessage, res: ServerResponse): Promise<void> {
     const route = `${req.method} ${req.url?.split('?')[0]}`;
     try {
@@ -54,25 +74,17 @@ export function stwSyncPlugin(): Plugin {
         writeAuth(root, { accountId, deviceId, secret, accountName: displayName });
         sendJson(res, 200, { accountName: displayName });
       } else if (route === 'POST /sync') {
-        const auth = readAuth(root);
-        if (!auth) {
-          sendJson(res, 401, { error: 'No Epic account linked', needsRelink: true });
-          return;
-        }
-        let token: string;
-        try {
-          token = await accessTokenFromDeviceAuth(auth);
-        } catch (e) {
-          if (e instanceof EpicApiError && (e.status === 400 || e.status === 401)) {
-            deleteAuth(root);
-            sendJson(res, 401, { error: 'Epic link expired - link your account again', needsRelink: true });
-            return;
-          }
-          throw e;
-        }
-        const profile = await queryCampaignProfile(token, auth.accountId);
+        const session = await requireToken(res);
+        if (!session) return;
+        const profile = await queryCampaignProfile(session.token, session.auth.accountId);
         const resources = parseCampaignResources(profile, (msg) => console.warn(`[stw-sync] ${msg}`));
-        sendJson(res, 200, { resources, accountName: auth.accountName, fetchedAt: new Date().toISOString() });
+        sendJson(res, 200, { resources, accountName: session.auth.accountName, fetchedAt: new Date().toISOString() });
+      } else if (route === 'POST /schematics') {
+        const session = await requireToken(res);
+        if (!session) return;
+        const profile = await queryCampaignProfile(session.token, session.auth.accountId);
+        const schematics = parseCampaignSchematics(profile, (msg) => console.warn(`[stw-sync] ${msg}`));
+        sendJson(res, 200, { schematics, accountName: session.auth.accountName });
       } else if (route === 'POST /unlink') {
         deleteAuth(root);
         sendJson(res, 200, { ok: true });
