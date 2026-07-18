@@ -110,6 +110,10 @@ export const TEMPLATE_MAP: Record<string, ResourceKey> = {
   reagent_alteration_ele_fire: 'fireUp',
   reagent_alteration_ele_water: 'frostUp',
   reagent_alteration_ele_nature: 'ampUp',
+  reagent_alteration_gameplay_generic: 'coreRePerk',
+  reagent_evolverarity_r: 'rareFlux',
+  reagent_evolverarity_vr: 'epicFlux',
+  reagent_evolverarity_sr: 'legendaryFlux',
 };
 
 interface ProfileItem {

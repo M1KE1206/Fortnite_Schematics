@@ -23,7 +23,11 @@ export type ResourceKey =
   | 'rePerk'
   | 'fireUp'
   | 'frostUp'
-  | 'ampUp';
+  | 'ampUp'
+  | 'coreRePerk'
+  | 'rareFlux'
+  | 'epicFlux'
+  | 'legendaryFlux';
 
 export type ResourceTotals = Partial<Record<ResourceKey, number>>;
 export type Inventory = Partial<Record<ResourceKey, number>>;

@@ -19,7 +19,7 @@ export const DEFAULT_COSTS: CostConfig = {
   elementChangePhysicalRePerk: 1500,
 };
 
-export const RESOURCES: { key: ResourceKey; label: string; group: 'evolution' | 'perk' | 'element' }[] = [
+export const RESOURCES: { key: ResourceKey; label: string; group: 'evolution' | 'perk' | 'element' | 'upgrade' }[] = [
   { key: 'pureDropsOfRain', label: 'Pure Drop of Rain', group: 'evolution' },
   { key: 'lightningInABottle', label: 'Lightning in a Bottle', group: 'evolution' },
   { key: 'eyeOfTheStorm', label: 'Eye of the Storm', group: 'evolution' },
@@ -32,6 +32,10 @@ export const RESOURCES: { key: ResourceKey; label: string; group: 'evolution' | 
   { key: 'fireUp', label: 'FIRE-UP!', group: 'element' },
   { key: 'frostUp', label: 'FROST-UP!', group: 'element' },
   { key: 'ampUp', label: 'AMP-UP!', group: 'element' },
+  { key: 'coreRePerk', label: 'Core RE-PERK!', group: 'perk' },
+  { key: 'rareFlux', label: 'Rare Flux', group: 'upgrade' },
+  { key: 'epicFlux', label: 'Epic Flux', group: 'upgrade' },
+  { key: 'legendaryFlux', label: 'Legendary Flux', group: 'upgrade' },
 ];
 
 export const ELEMENT_RESOURCE: Record<Exclude<ElementType, 'energy' | 'physical'>, ResourceKey> = {

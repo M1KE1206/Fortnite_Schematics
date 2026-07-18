@@ -21,6 +21,21 @@ describe('parseCampaignResources', () => {
     expect(result.frostUp).toBe(42);
   });
 
+  it('maps core re-perk and flux reagents', () => {
+    const result = parseCampaignResources(
+      profileWith({
+        a: { templateId: 'AccountResource:reagent_alteration_gameplay_generic', quantity: 321 },
+        b: { templateId: 'AccountResource:reagent_evolverarity_r', quantity: 11 },
+        c: { templateId: 'AccountResource:reagent_evolverarity_vr', quantity: 22 },
+        d: { templateId: 'AccountResource:reagent_evolverarity_sr', quantity: 33 },
+      }),
+    );
+    expect(result.coreRePerk).toBe(321);
+    expect(result.rareFlux).toBe(11);
+    expect(result.epicFlux).toBe(22);
+    expect(result.legendaryFlux).toBe(33);
+  });
+
   it('is case-insensitive on templateId', () => {
     const result = parseCampaignResources(
       profileWith({ a: { templateId: 'accountresource:Reagent_C_T04', quantity: 9 } }),

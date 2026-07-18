@@ -7,13 +7,14 @@ const GROUP_LABELS: Record<string, string> = {
   evolution: 'Evolution materials',
   perk: 'Perk resources',
   element: 'Elemental resources',
+  upgrade: 'Upgrade materials',
 };
 
 export default function TotalsSection() {
   const { state } = useAppState();
   const totals = totalCost(state.schematics, state.costs);
   const missing = shortage(totals, state.inventory);
-  const groups = ['evolution', 'perk', 'element'] as const;
+  const groups = ['evolution', 'perk', 'element', 'upgrade'] as const;
 
   if (state.schematics.length === 0) {
     return <p className="py-12 text-center text-zinc-500">Add schematics to see totals.</p>;
