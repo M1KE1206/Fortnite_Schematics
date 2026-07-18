@@ -1,4 +1,5 @@
 import type { Rarity } from '../src/types.js';
+import { SCHEMATIC_NAMES } from './data/schematicNames.js';
 
 export interface ImportedPerk {
   perkId: string | null;
@@ -91,6 +92,7 @@ interface ProfileItem {
 export function parseCampaignSchematics(
   profile: unknown,
   log: (msg: string) => void = () => {},
+  names: Record<string, string> = SCHEMATIC_NAMES,
 ): ImportedSchematic[] {
   const items = (
     profile as { profileChanges?: { profile?: { items?: Record<string, ProfileItem> } }[] } | null
@@ -121,7 +123,8 @@ export function parseCampaignSchematics(
         log(`Unknown alteration: ${aid}`);
       }
     }
-    out.push({ templateId: tpl, name: prettifyName(slug), rarity, level, perks, unknownAlterations });
+    const baseKey = tokens.filter((t) => !SUFFIX_TOKENS.has(t)).join('_');
+    out.push({ templateId: tpl, name: names[baseKey] ?? prettifyName(slug), rarity, level, perks, unknownAlterations });
   }
   return out.sort((a, b) => b.level - a.level);
 }

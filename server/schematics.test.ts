@@ -48,18 +48,18 @@ describe('parseCampaignSchematics', () => {
   };
 
   it('filters, parses and sorts by level descending', () => {
-    const result = parseCampaignSchematics(profileWith(items));
+    const result = parseCampaignSchematics(profileWith(items), undefined, {});
     expect(result.map((r) => r.name)).toEqual(['Assault Auto', 'Pistol Autoheavy', 'Launcher Grenade']);
   });
 
   it('clamps level to 10-50', () => {
-    const result = parseCampaignSchematics(profileWith(items));
+    const result = parseCampaignSchematics(profileWith(items), undefined, {});
     expect(result[0].level).toBe(50);
     expect(result[2].level).toBe(10);
   });
 
   it('parses schematic rarity token', () => {
-    const result = parseCampaignSchematics(profileWith(items));
+    const result = parseCampaignSchematics(profileWith(items), undefined, {});
     expect(result[0].rarity).toBe('gold');
     expect(result[1].rarity).toBe('purple');
     expect(result[2].rarity).toBe('green');
@@ -67,7 +67,7 @@ describe('parseCampaignSchematics', () => {
 
   it('maps perks and collects unknown alterations with logging', () => {
     const log = vi.fn();
-    const result = parseCampaignSchematics(profileWith(items), log);
+    const result = parseCampaignSchematics(profileWith(items), log, {});
     const pistol = result.find((r) => r.name === 'Pistol Autoheavy')!;
     expect(pistol.perks).toEqual([
       { perkId: 'critRating', rarity: 'purple' },
@@ -79,7 +79,34 @@ describe('parseCampaignSchematics', () => {
   });
 
   it('survives malformed input', () => {
-    expect(parseCampaignSchematics(null)).toEqual([]);
-    expect(parseCampaignSchematics({})).toEqual([]);
+    expect(parseCampaignSchematics(null, undefined, {})).toEqual([]);
+    expect(parseCampaignSchematics({}, undefined, {})).toEqual([]);
+  });
+});
+
+describe('name lookup', () => {
+  const names = { pistol_autoheavy: 'Whisper .45', assault_auto: 'Siegebreaker' };
+
+  it('uses real names when the base key matches', () => {
+    const result = parseCampaignSchematics(
+      profileWith({
+        a: { templateId: 'Schematic:sid_pistol_autoheavy_vr_ore_t04', attributes: { level: 30 } },
+        b: { templateId: 'Schematic:sid_assault_auto_sr_crystal_t05', attributes: { level: 20 } },
+      }),
+      undefined,
+      names,
+    );
+    expect(result.map((r) => r.name)).toEqual(['Whisper .45', 'Siegebreaker']);
+  });
+
+  it('falls back to prettified slug on miss', () => {
+    const result = parseCampaignSchematics(
+      profileWith({
+        a: { templateId: 'Schematic:sid_launcher_grenade_uc_ore_t01', attributes: { level: 10 } },
+      }),
+      undefined,
+      names,
+    );
+    expect(result[0].name).toBe('Launcher Grenade');
   });
 });
