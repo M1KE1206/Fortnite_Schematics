@@ -25,10 +25,10 @@ export class EpicApiError extends Error {
 const TOKEN_URL = 'https://account-public-service-prod.ol.epicgames.com/account/api/oauth/token';
 const ACCOUNT_URL = 'https://account-public-service-prod.ol.epicgames.com/account/api/public/account';
 const PROFILE_URL = 'https://fortnite-public-service-prod11.ol.epicgames.com/fortnite/api/game/v2/profile';
-const IOS_CLIENT_BASIC = 'MzQ0NmNkNzI2OTRjNGE0NDg1ZDgxYjc3YWRiYjIxNDE6OTIwOWQ0YTVlMjVhNDU3ZmI5YjA3NDg5ZDMxM2I0MWE=';
+const ANDROID_CLIENT_BASIC = 'M2Y2OWU1NmM3NjQ5NDkyYzhjYzI5ZjFhZjA4YThhMTI6YjUxZWU5Y2IxMjIzNGY1MGE2OWVmYTY3ZWY1MzgxMmU=';
 
 export const EPIC_LOGIN_URL =
-  'https://www.epicgames.com/id/api/redirect?clientId=3446cd72694c4a4485d81b77adbb2141&responseType=code';
+  'https://www.epicgames.com/id/api/redirect?clientId=3f69e56c7649492c8cc29f1af08a8a12&responseType=code';
 
 async function epicFetch(url: string, init: RequestInit): Promise<Record<string, unknown>> {
   let res: Response;
@@ -50,7 +50,7 @@ async function tokenRequest(params: Record<string, string>): Promise<Record<stri
   return epicFetch(TOKEN_URL, {
     method: 'POST',
     headers: {
-      Authorization: `basic ${IOS_CLIENT_BASIC}`,
+      Authorization: `basic ${ANDROID_CLIENT_BASIC}`,
       'Content-Type': 'application/x-www-form-urlencoded',
     },
     body: new URLSearchParams(params).toString(),

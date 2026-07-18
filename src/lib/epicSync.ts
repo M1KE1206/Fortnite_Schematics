@@ -21,7 +21,7 @@ export interface SyncResult {
 }
 
 export const EPIC_LOGIN_URL =
-  'https://www.epicgames.com/id/api/redirect?clientId=3446cd72694c4a4485d81b77adbb2141&responseType=code';
+  'https://www.epicgames.com/id/api/redirect?clientId=3f69e56c7649492c8cc29f1af08a8a12&responseType=code';
 
 const DEV_SERVER_HINT = 'Sync requires the dev server (npm run dev).';
 
