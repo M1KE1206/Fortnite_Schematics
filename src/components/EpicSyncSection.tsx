@@ -12,21 +12,30 @@ import { useAppState } from '../state/AppStateContext';
 
 export default function EpicSyncSection() {
   const { state, update } = useAppState();
-  const [linked, setLinked] = useState(false);
+  const [status, setStatus] = useState<'loading' | 'unavailable' | 'unlinked' | 'linked'>('loading');
   const [accountName, setAccountName] = useState('');
   const [code, setCode] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [lastSynced, setLastSynced] = useState('');
-  const [unavailable, setUnavailable] = useState(false);
 
   useEffect(() => {
+    let cancelled = false;
     getSyncStatus()
       .then((s) => {
-        setLinked(s.linked);
-        setAccountName(s.accountName ?? '');
+        if (!cancelled) {
+          setStatus(s.linked ? 'linked' : 'unlinked');
+          setAccountName(s.accountName ?? '');
+        }
       })
-      .catch(() => setUnavailable(true));
+      .catch(() => {
+        if (!cancelled) {
+          setStatus('unavailable');
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   async function run(action: () => Promise<void>) {
@@ -38,7 +47,7 @@ export default function EpicSyncSection() {
       if (e instanceof EpicSyncError) {
         setError(e.message);
         if (e.needsRelink) {
-          setLinked(false);
+          setStatus('unlinked');
           setAccountName('');
         }
       } else {
@@ -52,7 +61,7 @@ export default function EpicSyncSection() {
   const doLink = () =>
     run(async () => {
       const r = await linkAccount(code);
-      setLinked(true);
+      setStatus('linked');
       setAccountName(r.accountName);
       setCode('');
     });
@@ -67,7 +76,7 @@ export default function EpicSyncSection() {
   const doUnlink = () =>
     run(async () => {
       await unlinkAccount();
-      setLinked(false);
+      setStatus('unlinked');
       setAccountName('');
       setLastSynced('');
     });
@@ -75,9 +84,11 @@ export default function EpicSyncSection() {
   return (
     <section className="rounded border border-zinc-800 p-4">
       <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-zinc-400">Epic account sync</h2>
-      {unavailable ? (
+      {status === 'loading' ? (
+        <p className="text-sm text-zinc-500">Checking sync status...</p>
+      ) : status === 'unavailable' ? (
         <p className="text-sm text-zinc-500">Sync requires the dev server (npm run dev).</p>
-      ) : linked ? (
+      ) : status === 'linked' ? (
         <div className="flex flex-wrap items-center gap-3">
           <span className="flex items-center gap-2 text-sm text-zinc-200">
             <Link2 size={14} className="text-green-400" /> {accountName}
