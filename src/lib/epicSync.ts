@@ -1,4 +1,4 @@
-import type { ResourceKey } from '../types';
+import type { Rarity, ResourceKey } from '../types';
 
 export class EpicSyncError extends Error {
   needsRelink: boolean;
@@ -57,3 +57,20 @@ export const linkAccount = (authorizationCode: string): Promise<{ accountName: s
 export const syncInventory = (): Promise<SyncResult> => call('sync', { method: 'POST' });
 
 export const unlinkAccount = (): Promise<{ ok: boolean }> => call('unlink', { method: 'POST' });
+
+export interface ImportedPerk {
+  perkId: string | null;
+  rarity: Rarity;
+}
+
+export interface ImportedSchematic {
+  templateId: string;
+  name: string;
+  rarity: Rarity;
+  level: number;
+  perks: ImportedPerk[];
+  unknownAlterations: string[];
+}
+
+export const fetchEpicSchematics = (): Promise<{ schematics: ImportedSchematic[]; accountName: string }> =>
+  call('schematics', { method: 'POST' });

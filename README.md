@@ -13,6 +13,7 @@ across your whole collection, with inventory tracking and shortage overview.
 - All cost values editable in Settings (defaults follow current in-game values)
 - Data stored in localStorage; JSON export/import for backup
 - Optional one-click inventory sync from your Epic account (local only)
+- One-click import of your schematics (name, level, current perks) from your Epic account
 
 ## Epic account sync (optional)
 
