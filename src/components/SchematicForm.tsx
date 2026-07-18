@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { ImageOff, Loader2, Search } from 'lucide-react';
-import type { ElementType, Schematic } from '../types';
+import type { Schematic } from '../types';
 import { searchWikiIcons, toDataUrl, type WikiResult } from '../lib/wiki';
 import { useAppState } from '../state/AppStateContext';
 import PerkSlotEditor from './PerkSlotEditor';
@@ -10,14 +10,6 @@ interface Props {
   onSave: (s: Schematic) => void;
   onCancel: () => void;
 }
-
-const ELEMENTS: { value: ElementType; label: string }[] = [
-  { value: 'fire', label: 'Fire' },
-  { value: 'water', label: 'Water' },
-  { value: 'nature', label: 'Nature' },
-  { value: 'energy', label: 'Energy' },
-  { value: 'physical', label: 'Physical' },
-];
 
 export default function SchematicForm({ initial, onSave, onCancel }: Props) {
   const { state, update } = useAppState();
@@ -158,29 +150,6 @@ export default function SchematicForm({ initial, onSave, onCancel }: Props) {
               onChange={(s) => set('perkSlots', draft.perkSlots.map((p, j) => (j === i ? s : p)))}
             />
           ))}
-        </div>
-
-        <div className="mb-6 flex items-center gap-3">
-          <label className="flex items-center gap-2 text-sm">
-            <input
-              type="checkbox"
-              checked={draft.elementChange.needed}
-              onChange={(e) => set('elementChange', { needed: e.target.checked, element: e.target.checked ? draft.elementChange.element : null })}
-            />
-            Change element
-          </label>
-          {draft.elementChange.needed && (
-            <select
-              value={draft.elementChange.element ?? ''}
-              onChange={(e) => set('elementChange', { needed: true, element: e.target.value as ElementType })}
-              className="rounded border border-zinc-700 bg-zinc-800 px-2 py-1 text-sm"
-            >
-              <option value="" disabled>Pick element</option>
-              {ELEMENTS.map((el) => (
-                <option key={el.value} value={el.value}>{el.label}</option>
-              ))}
-            </select>
-          )}
         </div>
 
         <div className="flex justify-end gap-2">

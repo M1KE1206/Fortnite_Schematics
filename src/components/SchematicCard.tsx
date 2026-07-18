@@ -3,7 +3,7 @@ import { ChevronDown, ChevronUp, ImageOff, Pencil, Trash2, Zap } from 'lucide-re
 import type { Schematic } from '../types';
 import { schematicCost } from '../lib/calculator';
 import { RARITY_COLORS } from '../data/rarity';
-import { PERK_LABELS } from '../data/perks';
+import { ELEMENT_PERK_IDS, PERK_LABELS } from '../data/perks';
 import { useAppState } from '../state/AppStateContext';
 import ResourceList from './ResourceList';
 
@@ -17,6 +17,9 @@ export default function SchematicCard({ schematic, onEdit, onDelete }: Props) {
   const { state } = useAppState();
   const [open, setOpen] = useState(false);
   const cost = useMemo(() => schematicCost(schematic, state.costs), [schematic, state.costs]);
+  const elementTarget = schematic.perkSlots.find(
+    (p) => p.enabled && p.targetPerk && ELEMENT_PERK_IDS.has(p.targetPerk) && p.targetPerk !== 'elemPhysical',
+  )?.targetPerk;
 
   return (
     <div className="rounded-lg border border-zinc-800 bg-zinc-950 p-4">
@@ -32,9 +35,9 @@ export default function SchematicCard({ schematic, onEdit, onDelete }: Props) {
           <p className="truncate font-semibold">{schematic.name}</p>
           <p className="text-xs text-zinc-400">
             Lv {schematic.currentLevel} → {schematic.targetLevel}
-            {schematic.elementChange.needed && schematic.elementChange.element && (
+            {elementTarget && (
               <span className="ml-2 inline-flex items-center gap-1 text-amber-400">
-                <Zap size={10} /> {schematic.elementChange.element}
+                <Zap size={10} /> {(PERK_LABELS[elementTarget] ?? '').replace('Element: ', '')}
               </span>
             )}
           </p>

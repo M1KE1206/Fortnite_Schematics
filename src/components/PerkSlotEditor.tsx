@@ -1,6 +1,6 @@
 import { ArrowRight, RefreshCw } from 'lucide-react';
 import type { PerkSlot } from '../types';
-import { PERKS } from '../data/perks';
+import { PERKS, ELEMENT_PERK_IDS } from '../data/perks';
 import RaritySelect from './RaritySelect';
 
 interface Props {
@@ -45,7 +45,8 @@ export default function PerkSlotEditor({ slot, index, onChange }: Props) {
   const label = index === 5 ? 'Element slot' : `Perk ${index + 1}`;
   const cur = slot.currentPerk ?? null;
   const tgt = slot.targetPerk ?? null;
-  const autoReroll = cur !== null && tgt !== null && cur !== tgt;
+  const changed = cur !== null && tgt !== null && cur !== tgt;
+  const isElementChange = changed && ELEMENT_PERK_IDS.has(tgt);
   const showLegacyCheckbox = index < 5 && cur === null && tgt === null;
 
   return (
@@ -72,19 +73,17 @@ export default function PerkSlotEditor({ slot, index, onChange }: Props) {
             Needs reroll (RE-PERK!)
           </label>
         )}
-        {autoReroll && (
+        {changed && (
           <span className="ml-auto flex items-center gap-1 rounded bg-amber-500/15 px-2 py-0.5 text-xs font-medium text-amber-400">
-            <RefreshCw size={11} /> Reroll
+            <RefreshCw size={11} /> {isElementChange ? 'Element change' : 'Reroll'}
           </span>
         )}
       </div>
-      {index < 5 && (
-        <div className="mt-2 flex flex-wrap items-center gap-2">
-          <PerkSelect title="Current perk" value={cur} onChange={(v) => onChange({ ...slot, currentPerk: v })} />
-          <ArrowRight size={12} className="text-zinc-500" />
-          <PerkSelect title="Target perk" value={tgt} onChange={(v) => onChange({ ...slot, targetPerk: v })} />
-        </div>
-      )}
+      <div className="mt-2 flex flex-wrap items-center gap-2">
+        <PerkSelect title="Current perk" value={cur} onChange={(v) => onChange({ ...slot, currentPerk: v })} />
+        <ArrowRight size={12} className="text-zinc-500" />
+        <PerkSelect title="Target perk" value={tgt} onChange={(v) => onChange({ ...slot, targetPerk: v })} />
+      </div>
     </div>
   );
 }
