@@ -11,7 +11,8 @@ let skipped = 0;
 let m;
 while ((m = re.exec(xml)) !== null) {
   const [, nameSlug, sid] = m;
-  const sidTokens = sid.toLowerCase().split('_');
+  let sidTokens = sid.toLowerCase().split('_');
+  if (sidTokens[0] === 'trap') sidTokens = sidTokens.slice(1);
   const rarityToken = RARITY.has(sidTokens[sidTokens.length - 1]) ? sidTokens[sidTokens.length - 1] : null;
   const sidTokensWithoutRarity = rarityToken ? sidTokens.slice(0, -1) : sidTokens;
   const baseKey = sidTokensWithoutRarity.join('_');

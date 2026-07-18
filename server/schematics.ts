@@ -1,5 +1,6 @@
 import type { Rarity } from '../src/types.js';
 import { SCHEMATIC_NAMES } from './data/schematicNames.js';
+import { NAME_OVERRIDES } from './data/nameOverrides.js';
 
 export interface ImportedPerk {
   perkId: string | null;
@@ -33,7 +34,11 @@ const RARITY_TOKEN: Record<string, Rarity> = {
 
 const AID_PATTERNS: [string, string][] = [
   ['critchance', 'critRating'],
+  ['criticalchance', 'critRating'],
+  ['criticalrating', 'critRating'],
   ['critdmg', 'critDamage'],
+  ['critdamage', 'critDamage'],
+  ['criticaldamage', 'critDamage'],
   ['headshot', 'headshotDamage'],
   ['firerate', 'fireRate'],
   ['attackrate', 'fireRate'],
@@ -49,12 +54,15 @@ const AID_PATTERNS: [string, string][] = [
   ['mist', 'dmgMist'],
   ['stun', 'dmgStunned'],
   ['stagger', 'dmgStunned'],
+  ['knockback', 'knockback'],
   ['knockdown', 'dmgStunned'],
   ['affliction', 'dmgAfflicted'],
   ['aiming', 'aimDamage'],
   ['ads', 'aimDamage'],
   ['stability', 'stability'],
   ['recoil', 'stability'],
+  ['buildingheal', 'buildingHeal'],
+  ['effectduration', 'effectDuration'],
   ['fire', 'elemFire'],
   ['water', 'elemWater'],
   ['nature', 'elemNature'],
@@ -99,6 +107,7 @@ export function parseCampaignSchematics(
   )?.profileChanges?.[0]?.profile?.items;
   if (!items || typeof items !== 'object') return [];
   const out: ImportedSchematic[] = [];
+  const reported = new Set<string>();
   for (const item of Object.values(items)) {
     const tpl = item?.templateId;
     if (!tpl || !tpl.toLowerCase().startsWith('schematic:sid_')) continue;
@@ -118,6 +127,11 @@ export function parseCampaignSchematics(
       }
       const mapped = mapAlteration(aid);
       perks.push(mapped);
+      const aidBase = aid.toLowerCase().replace(/^alteration:/, '').replace(/_t0[1-5]\b/, '');
+      if (!reported.has(aidBase)) {
+        reported.add(aidBase);
+        log(`Alteration mapping: ${aidBase} -> ${mapped.perkId ?? 'UNKNOWN'}`);
+      }
       if (mapped.perkId === null) {
         unknownAlterations.push(aid);
         log(`Unknown alteration: ${aid}`);
@@ -126,7 +140,8 @@ export function parseCampaignSchematics(
     const baseTokens = tokens.filter((t) => !SUFFIX_TOKENS.has(t));
     const baseKey = baseTokens.join('_');
     const exactKey = rarityToken ? `${baseKey}_${rarityToken}` : baseKey;
-    out.push({ templateId: tpl, name: names[exactKey] ?? names[baseKey] ?? prettifyName(slug), rarity, level, perks, unknownAlterations });
+    const name = NAME_OVERRIDES[exactKey] ?? NAME_OVERRIDES[baseKey] ?? names[exactKey] ?? names[baseKey] ?? prettifyName(slug);
+    out.push({ templateId: tpl, name, rarity, level, perks, unknownAlterations });
   }
   return out.sort((a, b) => b.level - a.level);
 }

@@ -21,6 +21,8 @@ export const PERKS: PerkDef[] = [
   { id: 'lifeLeech', label: 'Life Leech', group: 'Utility' },
   { id: 'aimDamage', label: 'Ranged Weapon Damage while Aiming', group: 'Utility' },
   { id: 'stability', label: 'Weapon Stability', group: 'Utility' },
+  { id: 'buildingHeal', label: 'Building Healing', group: 'Utility' },
+  { id: 'effectDuration', label: 'Effect Duration', group: 'Utility' },
   { id: 'affliction', label: 'Affliction', group: 'Sixth perk' },
   { id: 'snare', label: 'Snare', group: 'Sixth perk' },
   { id: 'stun', label: 'Stun', group: 'Sixth perk' },

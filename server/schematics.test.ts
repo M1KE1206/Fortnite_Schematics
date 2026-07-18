@@ -27,6 +27,16 @@ describe('mapAlteration', () => {
   it('defaults to white without tier suffix', () => {
     expect(mapAlteration('aid_weapon_critchance').rarity).toBe('white');
   });
+  it('maps spelled-out crit aids', () => {
+    expect(mapAlteration('aid_weapon_criticaldamage_t03').perkId).toBe('critDamage');
+    expect(mapAlteration('aid_weapon_critdamage_t02').perkId).toBe('critDamage');
+    expect(mapAlteration('aid_weapon_criticalchance_t04').perkId).toBe('critRating');
+  });
+  it('maps trap attribute aids', () => {
+    expect(mapAlteration('Alteration:aid_att_buildingheal_t03').perkId).toBe('buildingHeal');
+    expect(mapAlteration('Alteration:aid_att_knockbackimpact_t02').perkId).toBe('knockback');
+    expect(mapAlteration('Alteration:aid_att_effectduration_t03').perkId).toBe('effectDuration');
+  });
 });
 
 describe('parseCampaignSchematics', () => {
@@ -118,5 +128,14 @@ describe('name lookup', () => {
       names,
     );
     expect(result[0].name).toBe('Legendary Name');
+  });
+
+  it('user overrides beat the generated table', () => {
+    const result = parseCampaignSchematics(
+      profileWith({ a: { templateId: 'Schematic:sid_wall_electric_r_ore_t02', attributes: { level: 20 } } }),
+      undefined,
+      { wall_electric: 'Wrong Table Name', wall_electric_r: 'Also Wrong' },
+    );
+    expect(result[0].name).toBe('Wall Dynamo');
   });
 });
