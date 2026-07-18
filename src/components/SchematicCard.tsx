@@ -3,6 +3,7 @@ import { ChevronDown, ChevronUp, ImageOff, Pencil, Trash2, Zap } from 'lucide-re
 import type { Schematic } from '../types';
 import { schematicCost } from '../lib/calculator';
 import { RARITY_COLORS } from '../data/rarity';
+import { PERK_LABELS } from '../data/perks';
 import { useAppState } from '../state/AppStateContext';
 import ResourceList from './ResourceList';
 
@@ -45,7 +46,11 @@ export default function SchematicCard({ schematic, onEdit, onDelete }: Props) {
         {schematic.perkSlots.map((slot, i) => (
           <span
             key={i}
-            title={`${i === 5 ? 'Element slot' : `Perk ${i + 1}`}: ${slot.currentRarity} → ${slot.targetRarity}`}
+            title={`${i === 5 ? 'Element slot' : `Perk ${i + 1}`}: ${
+              slot.currentPerk || slot.targetPerk
+                ? `${PERK_LABELS[slot.currentPerk ?? ''] ?? '(none)'} → ${PERK_LABELS[slot.targetPerk ?? ''] ?? '(none)'} (${slot.currentRarity} → ${slot.targetRarity})`
+                : `${slot.currentRarity} → ${slot.targetRarity}`
+            }`}
             className={`h-3 w-3 rounded-full ${RARITY_COLORS[slot.currentRarity]} ${slot.enabled ? '' : 'opacity-25'}`}
           />
         ))}
