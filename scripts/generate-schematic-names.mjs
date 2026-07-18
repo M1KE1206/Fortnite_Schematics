@@ -21,14 +21,16 @@ while ((m = re.exec(xml)) !== null) {
   if (RARITY.has(nameTokens[0])) nameTokens.shift();
   const name = nameTokens.map((w) => (w ? w[0].toUpperCase() + w.slice(1) : w)).join(' ');
 
-  // Always write exact key (no conflicts possible)
-  map[exactKey] = name;
-
   // Write base key only if it doesn't exist yet (first-wins for base keys)
-  if (!map[baseKey]) {
+  if (!(baseKey in map)) {
     map[baseKey] = name;
   } else if (map[baseKey] !== name) {
     skipped++;
+  }
+
+  // Write exact key only if it's different from base key (unconditional when different)
+  if (exactKey !== baseKey) {
+    map[exactKey] = name;
   }
 }
 
