@@ -2,6 +2,7 @@
 export const NAME_OVERRIDES: Record<string, string> = {
   wall_electric: 'Wall Dynamo',
   floor_ward: 'Anti-Air Trap',
+  floor_ward_antiair: 'Anti-Air Trap',
   wall_wood_spikes: 'Wall Spikes',
   assault_auto_halloween: 'Grave Digger',
   floor_health: 'Healing Pad',
