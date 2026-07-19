@@ -11,9 +11,12 @@ interface Props {
   schematic: Schematic;
   onEdit: () => void;
   onDelete: () => void;
+  selectMode?: boolean;
+  selected?: boolean;
+  onToggleSelect?: () => void;
 }
 
-export default function SchematicCard({ schematic, onEdit, onDelete }: Props) {
+export default function SchematicCard({ schematic, onEdit, onDelete, selectMode = false, selected = false, onToggleSelect }: Props) {
   const { state } = useAppState();
   const [open, setOpen] = useState(false);
   const cost = useMemo(() => schematicCost(schematic, state.costs), [schematic, state.costs]);
@@ -22,8 +25,16 @@ export default function SchematicCard({ schematic, onEdit, onDelete }: Props) {
   )?.targetPerk;
 
   return (
-    <div className="rounded-lg border border-zinc-800 bg-zinc-950 p-4">
+    <div className={`rounded-lg border bg-zinc-950 p-4 ${selected ? 'border-amber-500' : 'border-zinc-800'}`}>
       <div className="flex items-center gap-3">
+        {selectMode && (
+          <input
+            type="checkbox"
+            checked={selected}
+            onChange={onToggleSelect}
+            className="h-4 w-4 shrink-0 accent-amber-500"
+          />
+        )}
         <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded bg-zinc-800">
           {schematic.iconUrl ? (
             <img src={schematic.iconUrl} alt="" className="h-11 w-11 object-contain" />
@@ -42,8 +53,12 @@ export default function SchematicCard({ schematic, onEdit, onDelete }: Props) {
             )}
           </p>
         </div>
-        <button onClick={onEdit} className="text-zinc-500 hover:text-zinc-200" title="Edit"><Pencil size={16} /></button>
-        <button onClick={onDelete} className="text-zinc-500 hover:text-red-400" title="Delete"><Trash2 size={16} /></button>
+        {!selectMode && (
+          <>
+            <button onClick={onEdit} className="text-zinc-500 hover:text-zinc-200" title="Edit"><Pencil size={16} /></button>
+            <button onClick={onDelete} className="text-zinc-500 hover:text-red-400" title="Delete"><Trash2 size={16} /></button>
+          </>
+        )}
       </div>
       <div className="mt-3 flex items-center gap-1.5">
         {schematic.perkSlots.map((slot, i) => (
